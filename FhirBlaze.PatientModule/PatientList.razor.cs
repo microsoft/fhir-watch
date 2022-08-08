@@ -16,16 +16,12 @@ namespace FhirBlaze.PatientModule
     public partial class PatientList
     {
         [Inject]
-        IFhirService FhirService { get; set; }
-        protected bool ShowCreate { get; set; } = false;
-        protected bool ShowUpdate { get; set; } = false;
+        IFhirService FhirService { get; set; }        
         protected bool ShowSearch { get; set; } = false;
         protected bool Loading { get; set; } = true;
         
         protected bool ProcessingSearch { get; set; } = false;
         
-        protected bool ShowQuestionnaireList { get; set; } = false;
-        protected string QuestionnaireId { get; set; } = null;
         protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
         
         protected Patient SelectedPatient { get; set; } = new Patient();
@@ -39,25 +35,7 @@ namespace FhirBlaze.PatientModule
             Patients = await FhirService.GetPatientsAsync();
             Loading = false;
             ShouldRender();
-        }
-
-        public async Task<Patient> CreatePatient(Patient patient)
-        {
-            ResetSelectedPatient();
-            Patient createdPatient = null;
-            try
-            {
-                createdPatient = await FhirService.CreatePatientsAsync(patient);
-                Patients.Add(createdPatient);
-                ToggleCreate();
-                ShouldRender();
-            }catch (Exception e)
-            {
-                Console.WriteLine("Exception");
-                Console.WriteLine(e.Message);
-            }
-            return createdPatient;
-        }
+        }        
 
 
         public async Task SearchPatient(Patient patient)
@@ -78,43 +56,7 @@ namespace FhirBlaze.PatientModule
                 Console.WriteLine(e.Message); //manage the cancel search
             }
         }
-
-        public async Task<Patient> UpdatePatient(Patient updatedPatient)
-        {
-            
-            
-            try
-            {
-                updatedPatient = await FhirService.UpdatePatientAsync(updatedPatient.Id, updatedPatient);
-                var removePatient = Patients.FirstOrDefault(p => p.Id == SelectedPatient.Id);
-                if (removePatient != null)
-                {
-                    Patients.Remove(removePatient);
-                    Patients.Add(updatedPatient);
-                }
-                SelectedPatient = updatedPatient;
-                ToggleUpdate();
-                ShouldRender();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception occured editing patient");
-                Console.WriteLine(e.Message);
-            }
-            return updatedPatient;
-        }
-
-        public void ToggleCreate()
-        {
-            ShowCreate = !ShowCreate;
-            ResetSelectedPatient();
-        }
-
-        public void ToggleUpdate()
-        {   
-            ShowUpdate = !ShowUpdate; 
-        }
-
+        
         public void ToggleSearch()
         {
             ShowSearch = !ShowSearch;
@@ -132,14 +74,8 @@ namespace FhirBlaze.PatientModule
 
         private void PatientSelected(EventArgs e, Patient newPatient)
         {
-            SelectedPatient = newPatient;
-            ToggleUpdate();
+            SelectedPatient = newPatient;            
         }
 
-        public void ToggleQList(string qID)
-        {
-            QuestionnaireId = qID;
-            ShowQuestionnaireList = !ShowQuestionnaireList;
-        }
     }
 }

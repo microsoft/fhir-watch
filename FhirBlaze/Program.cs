@@ -7,7 +7,6 @@ using FhirBlaze.SharedComponents;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using FhirBlaze.Graph;
 using System.Net.Http;
-using FhirBlaze.SharedComponents.SMART;
 using Blazored.Modal;
 using FhirBlaze.SharedComponents.Services;
 
@@ -65,15 +64,7 @@ namespace FhirBlaze
             }
 
             builder.Services.AddBlazoredModal();
-
-            builder.Services.AddScoped<SmartLauncher>(o => 
-            {
-                var launcher = new SmartLauncher(builder.Configuration["ChestistApp:LaunchUrl"], builder.Configuration["FhirConnection:FhirServerUri"]);
-                return launcher;
-            });
-
             
-
             await builder.Build().RunAsync();
         }
     }
