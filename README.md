@@ -1,8 +1,8 @@
-# FHIRBlaze
-Welcome to FHIRBlaze!
+# FHIRWatch
+Welcome to FHIRWatch!
 
 ## Overview
-FHIRBlaze is a minimally viable Blazor WebAssembly application demonstrating how to interact with HL7 data from a Fast Health Interoperability Resources (FHIR) API.
+FHIRWatch is an MVP Blazor Webassembly static web app for comparing data synchronized between FHIR API and Microsoft Cloud for Health.
 
 ## Architecture
 A Blazor WebAssembly (wasm) application using the pattern of micro-frontends implemented by lazy-loading UI "modules" only when requested by navigation events from the client.
@@ -29,7 +29,7 @@ Other options include:
 * [and more...](https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-5.0)
 
 ### Next Steps
-[Fork this repo](https://github.com/microsoft/fhirblaze/fork) to modify or add your own functionality.
+[Fork this repo](https://github.com/microsoft/fhir-watch/fork) to modify or add your own functionality.
 
 ## Contributing
 
