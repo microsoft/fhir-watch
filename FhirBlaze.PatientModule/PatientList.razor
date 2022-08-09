@@ -36,6 +36,9 @@
                             <td>
                                 <button @onclick="@(e => PatientSelected(e, patient))" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span></button>
                             </td>
+                            <td>
+                                <button @onclick="@(e => NavigateToPatientDetail(e, patient.Id))" class="btn btn-primary"><span class="oi oi-code"></span></button>
+                            </td>
                         </tr>
                     }
                 </tbody>

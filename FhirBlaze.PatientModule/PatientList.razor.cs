@@ -16,6 +16,8 @@ namespace FhirBlaze.PatientModule
     public partial class PatientList
     {
         [Inject]
+        public NavigationManager navigationManager { get; set; }
+        [Inject]
         IFhirService FhirService { get; set; }        
         protected bool ShowSearch { get; set; } = false;
         protected bool Loading { get; set; } = true;
@@ -36,7 +38,6 @@ namespace FhirBlaze.PatientModule
             Loading = false;
             ShouldRender();
         }        
-
 
         public async Task SearchPatient(Patient patient)
         {
@@ -77,5 +78,9 @@ namespace FhirBlaze.PatientModule
             SelectedPatient = newPatient;            
         }
 
+        private void NavigateToPatientDetail(EventArgs e, string id)
+        {
+            navigationManager.NavigateTo($"patient/{id}");
+        }
     }
 }
