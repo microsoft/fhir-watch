@@ -1,0 +1,25 @@
+﻿@page "/patient/{Id}"
+@using FhirBlaze.SharedComponents
+@using Hl7.Fhir.Model
+
+<nav class="navbar navbar-light bg-light">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <button @onclick="NavigateToPatientList" class="btn btn-primary">Back to Patient List</button>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+    <br />
+    @if (!Loading)
+    {
+        <div class="container">
+            <RawJson Obj="@Patient" />
+        </div>
+    }
+    else
+    {
+        <LoadingSpinner />
+    }
+</div>
