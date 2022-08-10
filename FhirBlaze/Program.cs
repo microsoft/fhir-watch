@@ -38,6 +38,7 @@ namespace FhirBlaze
                 }
 
                 builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+                options.ProviderOptions.LoginMode = "redirect";
             })
             .AddAccountClaimsPrincipalFactory<RemoteAuthenticationState, RemoteUserAccount, GraphUserAccountFactory>();
 
