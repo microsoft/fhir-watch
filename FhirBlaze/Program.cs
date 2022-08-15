@@ -19,6 +19,15 @@ namespace FhirBlaze
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
+            //builder.Services.AddHttpClient("BackendAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            if (builder.HostEnvironment.IsDevelopment())
+            {
+                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri("http://localhost:7275/api/"));
+            }
+            else // is prod
+            {
+                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            }
             builder.Services.AddHttpClient<GraphClientFactory>(sp => new HttpClient { BaseAddress = new Uri("https://graph.microsoft.com") });
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
