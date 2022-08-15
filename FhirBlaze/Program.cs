@@ -45,13 +45,12 @@ namespace FhirBlaze
             builder.Services.AddScoped<GraphClientFactory>();
             if (builder.Configuration.GetValue<bool>("UseGraphir"))
             {
-                builder.Services.AddHttpClient<IFhirService, GraphirServices>
-                               (s =>
-                                   s.BaseAddress = new Uri(builder.Configuration["Graphir:GraphirUri"]))
-                                   .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
-                                   .ConfigureHandler(
-                                           authorizedUrls: new[] { builder.Configuration["Graphir:GraphirUri"] },
-                                           scopes: new[] { builder.Configuration["Graphir:GraphirScope"] }));
+                builder.Services.AddGraphirService(() =>
+                {
+                    var graphir = new GraphirConnection();
+                    builder.Configuration.Bind("Graphir", graphir);
+                    return graphir;
+                });
             }
             else
             {
