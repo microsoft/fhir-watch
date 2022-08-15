@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace FhirWatch.Api
 {
@@ -16,9 +17,10 @@ namespace FhirWatch.Api
         [FunctionName("GetContacts")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            ILogger log,
+            ExecutionContext context)
         {
-            var json = File.ReadAllText("Adan632_Brekke496.json");
+            var json = File.ReadAllText(context.FunctionAppDirectory + "/Adan632_Brekke496.json");
 
             JObject data = JObject.Parse(json);
 
