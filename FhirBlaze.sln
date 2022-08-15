@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FhirBlaze", "FhirBlaze\Fhir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FhirBlaze.PractitionerModule", "FhirBlaze.PractitionerModule\FhirBlaze.PractitionerModule.csproj", "{C48D11F5-F4C3-495D-AD69-7C570E080AA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FhirWatch.Api", "FhirWatch.Api\FhirWatch.Api.csproj", "{F686B42E-4481-4FCA-ACEE-0293D98CC816}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C48D11F5-F4C3-495D-AD69-7C570E080AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C48D11F5-F4C3-495D-AD69-7C570E080AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C48D11F5-F4C3-495D-AD69-7C570E080AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F686B42E-4481-4FCA-ACEE-0293D98CC816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F686B42E-4481-4FCA-ACEE-0293D98CC816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F686B42E-4481-4FCA-ACEE-0293D98CC816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F686B42E-4481-4FCA-ACEE-0293D98CC816}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

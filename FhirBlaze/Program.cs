@@ -9,7 +9,6 @@ using FhirBlaze.Graph;
 using System.Net.Http;
 using Blazored.Modal;
 using FhirBlaze.SharedComponents.Services;
-using Microsoft.PowerPlatform.Dataverse.Client;
 
 namespace FhirBlaze
 {
