@@ -42,5 +42,26 @@ internal static class FhirServiceExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddGraphirService(this IServiceCollection services, Func<GraphirConnection> connection)
+    {
+        var graphirData = connection.Invoke();
+
+        services.Configure<RemoteAuthenticationOptions<MsalProviderOptions>>(
+            options =>
+            {
+                options.ProviderOptions.AdditionalScopesToConsent.Add(graphirData.Scope);
+            });
+
+        services.AddHttpClient<IFhirService, GraphirServices>
+                               (s =>
+                                   s.BaseAddress = new Uri(graphirData.GraphirUri))
+                                   .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
+                                   .ConfigureHandler(
+                                           authorizedUrls: new[] { graphirData.GraphirUri },
+                                           scopes: new[] { graphirData.Scope }));
+
+        return services;
+    }
    
 }
