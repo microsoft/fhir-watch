@@ -15,7 +15,7 @@
     @if (!Loading)
     {
         <div class="container">
-            <RawJson Obj="@Patient" />
+            <Treeview Tvalue="MailItem" DataSource="@MyFolder" Id="Id" Text="FolderName" ParentId="ParentId" Expanded="Expanded"  HasChildren="HasSubFolder" />
         </div>
     }
     else
