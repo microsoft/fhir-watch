@@ -26,7 +26,7 @@ namespace FhirBlaze
             }
             else // is prod
             {
-                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress + "/api/"));
             }
             builder.Services.AddHttpClient<GraphClientFactory>(sp => new HttpClient { BaseAddress = new Uri("https://graph.microsoft.com") });
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
