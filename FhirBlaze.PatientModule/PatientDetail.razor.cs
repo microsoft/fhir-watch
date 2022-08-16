@@ -1,9 +1,11 @@
 ﻿using FhirBlaze.PatientModule.Properties;
+using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +25,9 @@ namespace FhirBlaze.PatientModule
         protected bool Loading { get; set; } = true;
         protected Patient Patient { get; set; } = new Patient();
         protected string PatientDV { get; set; }
+        protected Branch Trunk1 { get; set; }
+        protected Branch Trunk2 { get; set; }
+        protected bool Raw { get; set; } = false;
         [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -44,6 +49,10 @@ namespace FhirBlaze.PatientModule
             }
             PatientDV = jsonString;
             Loading = false;
+            Trunk1 = new Branch(Patient, "Patient", 1);
+            var patientDVObj = JsonConvert.SerializeObject(PatientDV);
+            Trunk2 = new Branch(patientDVObj, "Patient", 1);
+
             ShouldRender();
         }
         private void NavigateToPatientList()
