@@ -19,6 +19,15 @@ namespace FhirBlaze
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
+            //builder.Services.AddHttpClient("BackendAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            if (builder.HostEnvironment.IsDevelopment())
+            {
+                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri("http://localhost:7275/api/"));
+            }
+            else // is prod
+            {
+                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress + "/api/"));
+            }
             builder.Services.AddHttpClient<GraphClientFactory>(sp => new HttpClient { BaseAddress = new Uri("https://graph.microsoft.com") });
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
@@ -38,19 +47,19 @@ namespace FhirBlaze
                 }
 
                 builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+                options.ProviderOptions.LoginMode = "redirect";
             })
             .AddAccountClaimsPrincipalFactory<RemoteAuthenticationState, RemoteUserAccount, GraphUserAccountFactory>();
 
             builder.Services.AddScoped<GraphClientFactory>();
             if (builder.Configuration.GetValue<bool>("UseGraphir"))
             {
-                builder.Services.AddHttpClient<IFhirService, GraphirServices>
-                               (s =>
-                                   s.BaseAddress = new Uri(builder.Configuration["Graphir:GraphirUri"]))
-                                   .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
-                                   .ConfigureHandler(
-                                           authorizedUrls: new[] { builder.Configuration["Graphir:GraphirUri"] },
-                                           scopes: new[] { builder.Configuration["Graphir:GraphirScope"] }));
+                builder.Services.AddGraphirService(() =>
+                {
+                    var graphir = new GraphirConnection();
+                    builder.Configuration.Bind("Graphir", graphir);
+                    return graphir;
+                });
             }
             else
             {

@@ -12,7 +12,7 @@
 
     protected override void OnParametersSet()
     {
-        var json = new MarkupString(JsonConvert.SerializeObject(Obj, Formatting.Indented));
+        var json = new MarkupString(Obj as string ?? JsonConvert.SerializeObject(Obj, Formatting.Indented));
 
         convertedString = json;
     }
