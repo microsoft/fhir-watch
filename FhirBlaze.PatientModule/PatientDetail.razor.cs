@@ -20,6 +20,8 @@ namespace FhirBlaze.PatientModule
         public NavigationManager navigationManager { get; set; }
         [Inject]
         IFhirService FhirService { get; set; }
+        [Inject]
+        DataverseService DataverseService { get; set; }
         [Parameter]
         public string Id { get; set; }
         protected bool Loading { get; set; } = true;
@@ -34,13 +36,12 @@ namespace FhirBlaze.PatientModule
         {
             Loading = true;
             await base.OnInitializedAsync();
-            var patients = await FhirService.GetPatientsAsync();
-            Patient = patients.First(p => p.Id == Id);
+            Patient = await FhirService.GetResourceByIdAsync<Patient>(Id);
             //
             string jsonString;
             try
             {
-                jsonString = Resources.DVPatientData;
+                jsonString = await DataverseService.GetContactByFhirIdAsync(Id);
             }
             catch (Exception ex)
             {
