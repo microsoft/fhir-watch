@@ -1,15 +1,11 @@
 ﻿using FhirBlaze.PatientModule.Properties;
 using FhirBlaze.SharedComponents.Services;
-using Hl7.Fhir.ElementModel.Types;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
-using System.IO;
 using System.Linq;
-using System.Runtime.Versioning;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
