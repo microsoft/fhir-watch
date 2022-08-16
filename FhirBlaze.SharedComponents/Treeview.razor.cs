@@ -1,109 +1,123 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using System.Reflection;
 
 namespace FhirBlaze.SharedComponents
 {
-    public partial class Treeview<Tvalue>
+    public partial class Treeview
     {
         [Parameter]
-        public List<Tvalue> DataSource { get; set; }
-        [Parameter]
-        public string Id { get; set; }
-        [Parameter]
-        public string ParentId { get; set; }
-        [Parameter]
-        public string HasChildren { get; set; }
-        [Parameter]
-        public string Text { get; set; }
-        [Parameter]
-        public string Expanded { get; set; }
+        public Branch Trunk { get; set; }
 
-        public List<Tvalue> AllItems;
-        public Dictionary<int, bool> _caretDown = new Dictionary<int, bool>();
-        public Dictionary<int, string> _caretcss = new Dictionary<int, string>();
-        public Dictionary<int, string> _nestedcss = new Dictionary<int, string>();
-
-        protected override Task OnInitializedAsync()
+        private void SpanToggle(EventArgs e, Branch item)
         {
-            //asigning to its new instance to avoid exceptions.
-            AllItems = new List<Tvalue>();
-            AllItems = DataSource.ToArray().ToList();
+            item.Expanded = !item.Expanded;
+        }
+    }
 
-            if (AllItems == null)
-                return base.OnInitializedAsync();
+    public class Branch
+    {
+        public int Id { get; set; }
+        public int LayerId { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public List<Branch> Branches { get; set; }
+        public bool Expanded { get; set; } = false;
+        public bool IsObj { get; set; } = false;
 
-            foreach (var item in AllItems)
+        public Branch() { }
+        public Branch(object obj, string name, int id, int layerId = 0)
+        {
+            Id = id;
+            LayerId = layerId;
+
+            // if the object is a primitive or otherwise human readable, set value
+            if (obj == null)
             {
-                var _id = Convert.ToInt32(GetPropertyValue(item, Id));
+                Value = null;
+                Branches = null;
+                return;
+            }
+            else if (IsPrimitive(obj) || OverridesToString(obj))
+            {
+                Value = obj.ToString();
+                Branches = null;
+            }
+            else if (IsDate(obj))
+            {
+                Value = DateTime.TryParse(obj as string, out DateTime dateTime) ? dateTime.ToLongDateString() : "!error parsing date!";
+                Branches = null;
+            }
+            else
+            {
+                Value = null;
 
-                //initializing fields with default value.
-                _caretDown.Add(_id, true);
-                _caretcss.Add(_id, "caret");
-                _nestedcss.Add(_id, "nested");
+                // if list of things, convert things to branches
+                if (IsList(obj))
+                {
+                    var list = ((IEnumerable)obj).Cast<object>();
+                    //var list = obj as List<object>;
+
+                    // TODO: fix IDs
+                    Branches = list.Where(o => o != null).Select((o, i) => new Branch(o, $"[{i}]", i, layerId++)).Where(b => !string.IsNullOrEmpty(b.Name)).ToList();
+                }
+                else
+                {
+                    // otherwise convert properties to branches
+                    var props = obj.GetType().GetProperties().ToDictionary(pi => pi.Name, pi => pi.GetValue(obj));
+
+                    Branches = props.Where(kvp => kvp.Value != null).Select((kvp, i) => new Branch(kvp.Value, kvp.Key, i, layerId++)).Where(b => !string.IsNullOrEmpty(b.Name)).ToList();
+                    IsObj = true;
+                }
             }
 
-            return base.OnInitializedAsync();
+            Name = name;
         }
 
-        protected override Task OnParametersSetAsync()
+        private bool IsDate(object obj)
         {
-            // This will check if the first item in the
-            // list/collection has a "parentId" then remove the "parentId" from it.
-            // Because we use the first item as a reference in the razor file, so it must not have "parentId".
+            return DateTime.TryParse(obj as string, out var dateTime) || obj.GetType() == typeof(DateTimeOffset);
+        }
 
-            var Parem = AllItems.First();
-
-            switch (GetPropertyType(Parem, ParentId))
+        private bool OverridesToString(object obj)
+        {
+            try
             {
-                case "Int32":
-                    if (Convert.ToInt32(GetPropertyValue(Parem, ParentId)) > 0)
-                        SetPropertyValue(Parem, ParentId, 0);
-                    break;
-                case "String":
-                    if (GetPropertyValue(Parem, ParentId) != "")
-                        SetPropertyValue(Parem, ParentId, "");
-                    break;
-                default:
-                    break;
+                MethodInfo methodInfo = obj.GetType().GetMethod("ToString", new[] { typeof(string) });
+
+                if (methodInfo == null)
+                    return false;
+
+                return methodInfo.DeclaringType != methodInfo.GetBaseDefinition().DeclaringType;
             }
-
-            return base.OnParametersSetAsync();
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
-
-        private void SpanToggle(EventArgs e, Tvalue item)
+        private bool IsList(object obj)
         {
-            var _clckdItemid = Convert.ToInt32(GetPropertyValue(item, Id));
-
-            _caretcss[_clckdItemid] = _caretDown[_clckdItemid] ? "caret caret-down" : "caret";
-            _nestedcss[_clckdItemid] = _caretDown[_clckdItemid] ? "active" : "nested";
-            _caretDown[_clckdItemid] = !_caretDown[_clckdItemid];
+            try
+            {
+                return obj.GetType().GetGenericTypeDefinition() == typeof(List<>);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        #region reflection methodes to get your property type, propert value and also set property value
-        private static string GetPropertyValue(Tvalue item, string Property)
+        private bool IsPrimitive(object obj)
         {
-            if (item != null)
-                return item.GetType().GetProperty(Property).GetValue(item, null).ToString();
+            if (obj == null) // questionable..
+                return true;
 
-            return "";
+            var type = obj.GetType();
+
+            return obj is string || obj is decimal || type.IsEnum || obj.GetType().IsPrimitive;
         }
-
-        private static void SetPropertyValue<T>(Tvalue item, string Property, T value)
-        {
-            if (item != null)
-                item.GetType().GetProperty(Property).SetValue(item, value);
-        }
-
-        private static string GetPropertyType(Tvalue item, string Property)
-        {
-            if (item != null)
-                return item.GetType().GetProperty(Property).PropertyType.Name;
-
-            return null;
-        }
-        #endregion
     }
 }
