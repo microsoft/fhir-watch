@@ -14,8 +14,13 @@
     <br />
     @if (!Loading)
     {
-        <div class="container">
-            <RawJson Obj="@Patient" />
+        <div class="row">
+            <div class="col">
+                <RawJson Obj="@Patient" />
+            </div>
+            <div class="col">
+                <RawJson Obj="@PatientDV" />
+            </div>
         </div>
     }
     else
