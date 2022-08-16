@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+
+
+@*todo: figure out css here based on layerId, branch count, and expanded value*@
+@*todo: figure out toggle logic*@
+<div class="container">
+    @*if layerId == 0 then we are in the base layer and should display the ul & li with nesting, otherwise just showw nesting?*@
+    <ul class="@(Trunk.LayerId == 0 ? "parentUl": "")">
+        <li>
+
+            @if (Trunk.Branches != null && Trunk.Branches.Any())
+            {
+                <span @onclick="@(e => SpanToggle(e, Trunk))" class="caret @(Trunk.Expanded ? "caret-down" : "")">@Trunk.Name: @(Trunk.Value ?? (Trunk.IsObj ? "{...}" : "[...]")) </span>
+                <ul class="@(Trunk.Expanded ? "active" : "nested")">
+                    @foreach (var branch in Trunk.Branches)
+                    {
+                        <Treeview Trunk="branch" />
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>@Trunk.Name: @(Trunk.Value ?? string.Empty) </span>
+            }
+        </li>
+    </ul>
+</div>
