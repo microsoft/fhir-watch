@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using System.IO;
 
 [assembly: FunctionsStartup(typeof(FhirWatch.Api.Startup))]
