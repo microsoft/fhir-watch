@@ -9,25 +9,39 @@
         <li class="nav-item active">
             <button @onclick="NavigateToPatientList" class="btn btn-primary">Back to Patient List</button>
         </li>
+        <li class="nav-item">
+            <button @onclick="(e => Raw = !Raw)" class="btn btn-secondary">@(Raw ? "Show Tree View" : "Show Raw JSON")</button>
+        </li>
     </ul>
 </nav>
 
-<div class="container horizontal-scrollable vertical-scrollable">
+<div class="container">
     <br />
     @if (!Loading)
     {
-        <div class="row justify-content-start">
-            <div class="col-6 alert-dark justify-content-center">FHIR Data</div>
-            <div class="col-6 alert-dark justify-content-center">Dataverse Data</div>
-        </div>
-        <div class="row justify-content-start">
-            <div class="col-6 alert-primary">
-                <RawJson Obj="@Patient" />
+        @if (Raw)
+        {
+
+            <div class="row">
+                <div class="col">
+                    <RawJson Obj="@Patient" />
+                </div>
+                <div class="col">
+                    <RawJson Obj="@PatientDV" />
+                </div>
             </div>
-            <div class="col-6 alert-success">
-                <RawJson Obj="@PatientDV" />
+        }
+        else
+        {
+            <div class="row">
+                <div class="col">
+                    <Treeview Trunk="Trunk1" />
+                </div>
+                <div class="col">
+                    <Treeview Trunk="Trunk2" />
+                </div>
             </div>
-        </div>
+        }
     }
     else
     {
