@@ -1,6 +1,8 @@
 ﻿@page "/patient/{Id}"
 @using FhirBlaze.SharedComponents
+@using FhirBlaze.SharedComponents.Services
 @using Hl7.Fhir.Model
+@inject DataverseService dataverseClient
 
 <nav class="navbar navbar-light bg-light">
     <ul class="navbar-nav mr-auto">
@@ -10,15 +12,19 @@
     </ul>
 </nav>
 
-<div class="container">
+<div class="container horizontal-scrollable vertical-scrollable">
     <br />
     @if (!Loading)
     {
-        <div class="row">
-            <div class="col">
+        <div class="row justify-content-start">
+            <div class="col-6 alert-dark justify-content-center">FHIR Data</div>
+            <div class="col-6 alert-dark justify-content-center">Dataverse Data</div>
+        </div>
+        <div class="row justify-content-start">
+            <div class="col-6 alert-primary">
                 <RawJson Obj="@Patient" />
             </div>
-            <div class="col">
+            <div class="col-6 alert-success">
                 <RawJson Obj="@PatientDV" />
             </div>
         </div>
