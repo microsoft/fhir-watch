@@ -1,5 +1,4 @@
-﻿using FhirBlaze.PatientModule.Properties;
-using FhirBlaze.SharedComponents;
+﻿using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
@@ -51,6 +49,8 @@ namespace FhirBlaze.PatientModule
             }
             PatientDV = jsonString;
             Loading = false;
+            Trunk1 = new Branch(Patient, "Patient", 1);
+
             var patientDVObj = JsonConvert.DeserializeObject<JToken>(PatientDV);
             Trunk2 = new Branch(patientDVObj, "Patient", 1);
 
