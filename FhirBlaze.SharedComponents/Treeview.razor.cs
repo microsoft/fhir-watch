@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Hl7.Fhir.Model;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Graph;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -75,6 +79,68 @@ namespace FhirBlaze.SharedComponents
             }
 
             Name = name;
+        }
+        public Branch(JToken jToken, string name, int id, int layerId = 0)
+        {
+            Id = id;
+            LayerId = layerId;
+
+            var parent = jToken.Parent as JProperty;
+            Name = name ?? parent?.Name ?? $"[{id}]";
+
+            switch (jToken.Type)
+            {
+                case JTokenType.None:
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                    Value = null;
+                    Branches = null;
+                    break;
+                case JTokenType.String:
+                case JTokenType.Uri:
+                case JTokenType.Integer:
+                case JTokenType.Float:
+                case JTokenType.Boolean:
+                    Value = jToken.ToString();
+                    Branches = null;
+                    break;
+                case JTokenType.Date:
+                case JTokenType.TimeSpan:
+                    Value = jToken.ToString();
+                    Branches = null;
+                    break;
+                case JTokenType.Property:
+                    var prop = jToken as JProperty;
+                    Name = prop.Name;
+
+                    if (prop.Value is JArray)
+                    {
+                        Value = null;
+                        Branches = prop.Value.Children().Select((c, i) => new Branch(c, null, i, layerId + 1)).ToList();
+                    }
+                    else
+                    {
+                        Value = prop.Value.ToString();
+                        Branches = null;
+                    }
+                    break;
+                case JTokenType.Object:
+                    Value = null;
+                    Branches = jToken.Children().Select((c, i) => new Branch(c, null, i, layerId + 1)).ToList();
+                    IsObj = true;
+                    break;
+                case JTokenType.Array:
+                    Value = null;
+                    Branches = jToken.Children().Select((c, i) => new Branch(c, null, i, layerId + 1)).ToList();
+                    break;
+                case JTokenType.Constructor:
+                case JTokenType.Comment:
+                case JTokenType.Raw:
+                case JTokenType.Guid:
+                case JTokenType.Bytes:
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         private bool IsDate(object obj)
