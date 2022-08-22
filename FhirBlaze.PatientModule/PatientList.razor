@@ -7,11 +7,19 @@
         <li class="nav-item active">
             <button @onclick="ToggleSearch" class="btn btn-primary">@(ShowSearch?"Cancel": "Search Patient")</button>
         </li>
+        <li class="nav-item">
+            <button @onclick="@(()=>{ShowComparison = !ShowComparison;})" class="btn btn-secondary">@(ShowComparison ? "Cancel" : "Compare Patients")</button>
+        </li>
     </ul>
 </nav>
 @if (ShowSearch)
 {
     <PatientSearch Patient="DraftPatient" Processing="@ProcessingSearch" SearchPatient="SearchPatient" />
+}
+@if (ShowComparison)
+{
+    <div>Hello MJ!</div>
+    @*<PatientCompare Patients=""/>*@
 }
 <div class="container">
     <br />

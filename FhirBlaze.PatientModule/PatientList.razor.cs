@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using Task = System.Threading.Tasks.Task;
+using Newtonsoft.Json.Linq;
 
 namespace FhirBlaze.PatientModule
 {
@@ -20,6 +21,8 @@ namespace FhirBlaze.PatientModule
         [Inject]
         IFhirService FhirService { get; set; }        
         protected bool ShowSearch { get; set; } = false;
+        protected bool ShowComparison { get; set; } = false;
+        public IDictionary<string, (Patient, JToken)> PatientsToCompare { get; set; }
         protected bool Loading { get; set; } = true;
         
         protected bool ProcessingSearch { get; set; } = false;
