@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FhirWatch.Api
@@ -51,8 +52,15 @@ namespace FhirWatch.Api
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log,
-            ExecutionContext context)
+            ExecutionContext context,
+            ClaimsPrincipal principal)
         {
+            log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
+            if (!principal.Identity.IsAuthenticated)
+            {
+                return new UnauthorizedResult();
+            }
+
             var json = await File.ReadAllTextAsync(context.FunctionAppDirectory + "/Adan632_Brekke496.json");
 
             JObject data = JObject.Parse(json);
@@ -64,8 +72,15 @@ namespace FhirWatch.Api
         public async Task<IActionResult> GetById(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetContact/{fhirId}")] HttpRequest req,
             string fhirId,
-            ILogger log)
+            ILogger log,
+            ClaimsPrincipal principal)
         {
+            log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
+            if (!principal.Identity.IsAuthenticated)
+            {
+                return new UnauthorizedResult();
+            }
+
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
