@@ -56,11 +56,7 @@ namespace FhirWatch.Api
             ClaimsPrincipal principal)
         {
             log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
-            if (!principal.Identity.IsAuthenticated)
-            {
-                return new UnauthorizedResult();
-            }
-
+            
             var json = await File.ReadAllTextAsync(context.FunctionAppDirectory + "/Adan632_Brekke496.json");
 
             JObject data = JObject.Parse(json);
@@ -76,11 +72,7 @@ namespace FhirWatch.Api
             ClaimsPrincipal principal)
         {
             log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
-            if (!principal.Identity.IsAuthenticated)
-            {
-                return new UnauthorizedResult();
-            }
-
+            
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
