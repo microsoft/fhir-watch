@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using FhirBlaze.Graph;
 using System.Net.Http;
 using Blazored.Modal;
 using FhirBlaze.SharedComponents.Services;
+using System.Net;
 
 namespace FhirBlaze
 {
@@ -17,17 +19,21 @@ namespace FhirBlaze
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            
+            // Get Backend API configuration
+            var apiConnection = new ApiConnection();
+            builder.Configuration.Bind("Api", apiConnection);
+            if (string.IsNullOrEmpty(apiConnection.BaseUri))
+                apiConnection.BaseUri = builder.HostEnvironment.BaseAddress;
+            
             builder.RootComponents.Add<App>("#app");
 
-            //builder.Services.AddHttpClient("BackendAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-            if (builder.HostEnvironment.IsDevelopment())
-            {
-                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri("http://localhost:7275/api/"));
-            }
-            else // is prod
-            {
-                builder.Services.AddHttpClient<DataverseService>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress + "/api/"));
-            }
+            // Register API Backend
+            builder.Services.AddDataverseService(() =>
+            {                
+                return apiConnection;
+            });
+
             builder.Services.AddHttpClient<GraphClientFactory>(sp => new HttpClient { BaseAddress = new Uri("https://graph.microsoft.com") });
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
@@ -63,7 +69,6 @@ namespace FhirBlaze
             }
             else
             {
-
                 builder.Services.AddFhirService(() =>
                 {
                     var fhir = new FhirDataConnection();
@@ -73,7 +78,7 @@ namespace FhirBlaze
             }
 
             builder.Services.AddBlazoredModal();
-            
+
             await builder.Build().RunAsync();
         }
     }
