@@ -40,7 +40,7 @@ namespace FhirBlaze.PatientModule
             string jsonString;
             try
             {
-                jsonString = await DataverseService.GetContactByFhirIdAsync(Id);
+                jsonString = await DataverseService.GetPatientByFhirIdAsync(Id);
             }
             catch (Exception ex)
             {

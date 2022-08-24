@@ -12,14 +12,19 @@ namespace FhirBlaze.SharedComponents.Services
             this.http = http;
         }
 
-        public async Task<string> GetSampleContactDataAsync()
+        public async Task<string> GetSamplePatientDataAsync()
         {
             return await http.GetStringAsync("GetContacts");
         }
 
-        public async Task<string> GetContactByFhirIdAsync(string fhirId)
+        public async Task<string> GetPatientByFhirIdAsync(string fhirId)
         {
-            return await http.GetStringAsync($"GetContact/{fhirId}");
+            return await http.GetStringAsync($"patients/{fhirId}");
+        }
+
+        public async Task<string> GetPatients()
+        {
+            return await http.GetStringAsync($"patients");
         }
     }
 }
