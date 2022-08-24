@@ -41,11 +41,13 @@ namespace FhirBlaze.PatientModule
             Loading = true;
             await base.OnInitializedAsync();
             Patients = await FhirService.GetPatientsAsync();
+            
             var fhirId = "d001a1ee-19b9-a072-8ecd-91725f30e09d"; // Adan632 Brekke496
             var dvPatient = await DataverseService.GetPatientByFhirIdAsync(fhirId);
             var fhirPatient = Patients.FirstOrDefault(p => p.Id == fhirId);
             var value = new Tuple<Patient, JToken>(fhirPatient, dvPatient);
             PatientsToCompare.Add(fhirId, value);
+
             Loading = false;
             ShouldRender();
         }        
