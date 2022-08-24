@@ -46,50 +46,16 @@ namespace FhirBlaze.PatientModule
             DateOfBirth = patient.BirthDate;
         }
 
-        public FhirPatientViewModel(string id, JToken token)
+        public FhirPatientViewModel(string id, JToken patientJson)
         {
-            // hardcoded data for demo
-            //Id = id;
-            //FirstName = "MJ";
-            //LastName = "Schanne";
-            //DateOfBirth = DateTime.Now.ToString();
+            Id = id;
 
-            var jValue = token as JValue;
-            
-            try
-            {
-                var obj = jValue.Children().FirstOrDefault();
-                var obj2 = jValue.ToArray().FirstOrDefault();
-                var obj3 = jValue.ToList().FirstOrDefault();
+            var jObject = JObject.Parse(patientJson.ToString());
+            var attributes = jObject["attributes"];
 
-                var val = jValue.Value;
-
-                var array = val as JArray;
-
-                var valType = val.GetType();
-
-                //var jObject = obj as JObject;
-
-                //var attributes = jObject["attributes"];
-
-                //DateOfBirth = obj?.SelectToken(".attributes[?(@.key == 'birthdate')]")?.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            //Id = id;
-            //FirstName = null;
-            //LastName = null;
-            //try
-            //{
-            //    DateOfBirth = attributes.Select(i => i as JObject).Select(o => o?.Properties()?.FirstOrDefault(p => p.Name == "birthdate")).FirstOrDefault()?.Value.ToString();
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
+            FirstName = jObject.SelectToken(".attributes[?(@.key == 'firstname')].value")?.ToString();
+            LastName = jObject.SelectToken(".attributes[?(@.key == 'lastname')].value")?.ToString();
+            DateOfBirth = jObject.SelectToken(".attributes[?(@.key == 'birthdate')].value")?.ToString();
         }
 
         public string Id { get; set; }
