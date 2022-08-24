@@ -5,62 +5,65 @@
 <nav class="navbar navbar-light bg-light">
     <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-            <button @onclick="ToggleSearch" class="btn btn-primary">@(ShowSearch?"Cancel": "Search Patient")</button>
+            <button @onclick="ToggleSearch" class="btn btn-primary">@(ShowSearch ? "Cancel" : "Search Patient")</button>
         </li>
         <li class="nav-item">
             <button @onclick="@(()=>{ShowComparison = !ShowComparison;})" class="btn btn-secondary">@(ShowComparison ? "Cancel" : "Compare Patients")</button>
         </li>
     </ul>
 </nav>
-@if (ShowSearch)
-{
-    <PatientSearch Patient="DraftPatient" Processing="@ProcessingSearch" SearchPatient="SearchPatient" />
-}
+
 @if (ShowComparison)
 {
-    <div>Hello MJ!</div>
-    @*<PatientCompare Patients=""/>*@
+    <PatientCompare Patients="PatientsToCompare" />
 }
-<div class="container">
-    <br />
-    @if (!Loading)
+else
+{
+    @if (ShowSearch)
     {
-        <div class="container">
+        <PatientSearch Patient="DraftPatient" Processing="@ProcessingSearch" SearchPatient="SearchPatient" />
+    }
 
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>DOB</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var patient in Patients)
-                    {
-                        <tr>
-                            <td>@patient.Name.FirstOrDefault()</td>
-                            <td>@patient.BirthDate</td>
-                            <td>
-                                <button @onclick="@(e => PatientSelected(e, patient))" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span></button>
-                            </td>
-                            <td>
-                                <button @onclick="@(e => NavigateToPatientDetail(e, patient.Id))" class="btn btn-primary"><span class="oi oi-code"></span></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-        </div>
-
+    <div class="container">
         <br />
-        <h3>Found: @Patients.Count patients!</h3>
+        @if (!Loading)
+        {
+            <div class="container">
 
-    }
-    else
-    {
-        <LoadingSpinner />
-    }
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>DOB</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var patient in Patients)
+                        {
+                            <tr>
+                                <td>@patient.Name.FirstOrDefault()</td>
+                                <td>@patient.BirthDate</td>
+                                <td>
+                                    <button @onclick="@(e => PatientSelected(e, patient))" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span></button>
+                                </td>
+                                <td>
+                                    <button @onclick="@(e => NavigateToPatientDetail(e, patient.Id))" class="btn btn-primary"><span class="oi oi-code"></span></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
-</div>
+            </div>
+
+            <br />
+            <h3>Found: @Patients.Count patients!</h3>
+        }
+        else
+        {
+            <LoadingSpinner />
+        }
+
+    </div>
+}

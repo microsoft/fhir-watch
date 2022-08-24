@@ -1,5 +1,38 @@
 ﻿<h3>PatientCompare</h3>
 
-@code {
+@Patients.FirstOrDefault().Value.Item2.ToString();
 
-}
+<br />
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col" rowspan="2" class="text-center" style="vertical-align: middle">Id</th>
+            <th scope="col" colspan="2">FirstName</th>
+            <th scope="col" colspan="2">LastName</th>
+            <th scope="col" colspan="2">DateOfBirth</th>
+        </tr>
+        <tr>
+            <th scope="col">FHIR</th>
+            <th scope="col">Dataverse</th>
+            <th scope="col">FHIR</th>
+            <th scope="col">Dataverse</th>
+            <th scope="col">FHIR</th>
+            <th scope="col">Dataverse</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var patientPair in PatientPairs)
+        {
+            <tr>
+                <th scope="row">@patientPair.Item1.Id</th>
+                <th>@patientPair.Item1.FirstName</th>
+                <th>@patientPair.Item2.FirstName</th>
+                <th>@patientPair.Item1.LastName</th>
+                <th>@patientPair.Item2.LastName</th>
+                <th>@patientPair.Item1.DateOfBirth</th>
+                <th>@patientPair.Item2.DateOfBirth</th>
+            </tr>
+        }
+    </tbody>
+</table>

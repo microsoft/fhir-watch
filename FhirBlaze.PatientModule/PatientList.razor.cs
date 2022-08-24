@@ -19,10 +19,13 @@ namespace FhirBlaze.PatientModule
         [Inject]
         public NavigationManager navigationManager { get; set; }
         [Inject]
-        IFhirService FhirService { get; set; }        
+        IFhirService FhirService { get; set; }
+
+        [Inject]
+        DataverseService DataverseService { get; set; }
         protected bool ShowSearch { get; set; } = false;
         protected bool ShowComparison { get; set; } = false;
-        public IDictionary<string, (Patient, JToken)> PatientsToCompare { get; set; }
+        public IDictionary<string, Tuple<Patient, JToken>> PatientsToCompare { get; set; } = new Dictionary<string, Tuple<Patient, JToken>>();
         protected bool Loading { get; set; } = true;
         
         protected bool ProcessingSearch { get; set; } = false;
@@ -38,6 +41,11 @@ namespace FhirBlaze.PatientModule
             Loading = true;
             await base.OnInitializedAsync();
             Patients = await FhirService.GetPatientsAsync();
+            var fhirId = "d001a1ee-19b9-a072-8ecd-91725f30e09d"; // Adan632 Brekke496
+            var dvPatient = await DataverseService.GetContactByFhirIdAsync(fhirId);
+            var fhirPatient = Patients.FirstOrDefault(p => p.Id == fhirId);
+            var value = new Tuple<Patient, JToken>(fhirPatient, dvPatient);
+            PatientsToCompare.Add(fhirId, value);
             Loading = false;
             ShouldRender();
         }        
