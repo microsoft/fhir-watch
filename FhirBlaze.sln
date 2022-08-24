@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FhirBlaze", "FhirBlaze\Fhir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FhirBlaze.PractitionerModule", "FhirBlaze.PractitionerModule\FhirBlaze.PractitionerModule.csproj", "{C48D11F5-F4C3-495D-AD69-7C570E080AA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FhirWatch.Api", "FhirWatch.Api\FhirWatch.Api.csproj", "{F686B42E-4481-4FCA-ACEE-0293D98CC816}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FhirWatch.Api", "FhirWatch.Api\FhirWatch.Api.csproj", "{F686B42E-4481-4FCA-ACEE-0293D98CC816}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
