@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace FhirWatch.Api
 {
-    public class GetContacts
+    public class Patients
     {
         private readonly ServiceClient _client;
         private readonly IList<string> columnNames;
 
-        public GetContacts(ServiceClient client)
+        public Patients(ServiceClient client)
         {
             _client = client;
 
@@ -48,15 +48,12 @@ namespace FhirWatch.Api
             };
         }
 
-        [FunctionName("GetContacts")]
+        [FunctionName("PatientSample")]
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log,
-            ExecutionContext context,
-            ClaimsPrincipal principal)
+            ExecutionContext context)
         {
-            log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
-            
             var json = await File.ReadAllTextAsync(context.FunctionAppDirectory + "/Adan632_Brekke496.json");
 
             JObject data = JObject.Parse(json);
@@ -64,15 +61,45 @@ namespace FhirWatch.Api
             return new OkObjectResult(data);
         }
 
-        [FunctionName("GetContactsById")]
-        public async Task<IActionResult> GetById(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetContact/{fhirId}")] HttpRequest req,
-            string fhirId,
-            ILogger log,
-            ClaimsPrincipal principal)
+        [FunctionName("AllPatients")]
+        public async Task<IActionResult> GetPatients(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patients")] HttpRequest req,
+            ILogger log)
         {
-            log.LogInformation($"Your authenticated status: {principal.Identity.IsAuthenticated}");
-            
+            QueryExpression query = new QueryExpression
+            {
+                EntityName = "contact",
+                ColumnSet = new ColumnSet(columnNames.ToArray()),
+                Criteria = new FilterExpression
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Conditions =
+                    {
+                        new ConditionExpression
+                        {
+                            AttributeName = "msemr_contacttype",
+                            Operator = ConditionOperator.Equal,
+                            Values = { 935000000 } 
+                            /*
+                             * Patient - 935000000
+                             * Practitioner - 935000001
+                             * Related Person - 935000002
+                             */
+                        }
+                    }
+                }
+            };
+
+            var resp = await _client.RetrieveMultipleAsync(query);
+            return new OkObjectResult(resp.Entities);
+        }
+
+        [FunctionName("PatientById")]
+        public async Task<IActionResult> GetById(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patients/{fhirId}")] HttpRequest req,
+            string fhirId,
+            ILogger log)
+        {            
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
@@ -93,7 +120,7 @@ namespace FhirWatch.Api
             };
 
             var resp = await _client.RetrieveMultipleAsync(query);
-            return new OkObjectResult(resp.Entities);
+            return new OkObjectResult(resp.Entities.FirstOrDefault());
         }
     }
 }
