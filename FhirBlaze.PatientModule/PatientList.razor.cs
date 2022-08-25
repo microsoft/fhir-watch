@@ -24,18 +24,19 @@ namespace FhirBlaze.PatientModule
         IFhirService FhirService { get; set; }
         [Inject]
         DataverseService DataverseService { get; set; }
-        
+
         protected bool ShowSearch { get; set; } = false;
         protected bool ShowComparison { get; set; } = false;
         protected bool Loading { get; set; } = true;
         protected bool ProcessingSearch { get; set; } = false;
         protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
-        protected IList<PatientCompareModel> SelectedPatients { get; set; } = new List<PatientCompareModel>();
-        
-        public IList<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
+        //protected IList<PatientCompareModel> SelectedPatients { get; set; } = new List<PatientCompareModel>();
+        protected List<PatientCompareModel> SelectedPatients => Patients.Where(p => p.IsSelected).ToList();
+
+        public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
             Loading = true;
             await base.OnInitializedAsync();
             var fhirPatients = await FhirService.GetPatientsAsync();
@@ -59,7 +60,7 @@ namespace FhirBlaze.PatientModule
 
             Loading = false;
             ShouldRender();
-        }        
+        }
 
         public async Task SearchPatient(Patient patient)
         {
@@ -68,7 +69,7 @@ namespace FhirBlaze.PatientModule
             //{
             //    Patients = await FhirService.SearchPatient(patient); //change to patient
             //    ProcessingSearch = true;
-                
+
             //    ProcessingSearch = false;
             //    ToggleSearch();
             //    ShouldRender();
@@ -79,8 +80,14 @@ namespace FhirBlaze.PatientModule
             //    Console.WriteLine(e.Message); //manage the cancel search
             //}
         }
-        
-        public void ToggleSearch()
+
+        private void ToggleComparison()
+        {
+            if (ShowComparison) ResetSelectedPatient();
+            ShowComparison = !ShowComparison;
+        }
+
+        private void ToggleSearch()
         {
             ShowSearch = !ShowSearch;
             ResetSelectedPatient();
@@ -92,12 +99,38 @@ namespace FhirBlaze.PatientModule
 
         private void ResetSelectedPatient()
         {
-            SelectedPatients.Clear();
+            Patients.ForEach(p => p.IsSelected = false);
+            //SelectedPatients.Clear();
         }
 
-        private void PatientSelected(EventArgs e, PatientCompareModel newPatient)
+        private void SelectAll(object isChecked)
         {
-            SelectedPatients.Add(newPatient);
+            if ((bool)isChecked)
+            {
+                Patients.ForEach(p => p.IsSelected = true);
+            }
+            else
+            {
+                Patients.ForEach(p => p.IsSelected = false);
+            }
+        }
+
+        private void PatientSelected(object isChecked, PatientCompareModel newPatient)
+        {
+            if ((bool)isChecked && !SelectedPatients.Contains(newPatient))
+            {
+                newPatient.IsSelected = true;
+                //SelectedPatients.Add(newPatient);
+            }
+            else
+            {
+                newPatient.IsSelected = false;
+                //if (SelectedPatients.Contains(newPatient))
+                //{
+                //    SelectedPatients.Remove(newPatient);
+                //}
+            }
+            StateHasChanged();
         }
 
         private void NavigateToPatientDetail(EventArgs e, string id)

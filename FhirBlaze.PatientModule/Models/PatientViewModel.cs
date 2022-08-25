@@ -81,6 +81,7 @@ namespace FhirBlaze.PatientModule.Models
         public string Id { get; set; }
         public PatientViewModel Item1 { get; set; }
         public PatientViewModel Item2 { get; set; }
+        public bool IsSelected { get; set; } = false;
 
         public PatientCompareModel(string id, PatientViewModel item1, PatientViewModel item2)
         {
@@ -88,5 +89,6 @@ namespace FhirBlaze.PatientModule.Models
             Item1 = item1;
             Item2 = item2;
         }
+
     }
 }
