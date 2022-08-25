@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FhirBlaze.SharedComponents.Services
@@ -12,19 +13,16 @@ namespace FhirBlaze.SharedComponents.Services
             this.http = http;
         }
 
-        public async Task<string> GetSamplePatientDataAsync()
+        public async Task<JObject> GetPatientByFhirIdAsync(string fhirId)
         {
-            return await http.GetStringAsync("GetContacts");
+            var result = await http.GetStringAsync($"patients/{fhirId}");
+            return JObject.Parse(result);
         }
 
-        public async Task<string> GetPatientByFhirIdAsync(string fhirId)
+        public async Task<JArray> GetPatients()
         {
-            return await http.GetStringAsync($"patients/{fhirId}");
-        }
-
-        public async Task<string> GetPatients()
-        {
-            return await http.GetStringAsync($"patients");
+            var results = await http.GetStringAsync($"patients");
+            return JArray.Parse(results);
         }
     }
 }

@@ -46,20 +46,7 @@ namespace FhirWatch.Api
                 "msemr_azurefhirlastupdatedon",
                 "accountid"
             };
-        }
-
-        [FunctionName("PatientSample")]
-        public async Task<IActionResult> Get(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
-            ILogger log,
-            ExecutionContext context)
-        {
-            var json = await File.ReadAllTextAsync(context.FunctionAppDirectory + "/Adan632_Brekke496.json");
-
-            JObject data = JObject.Parse(json);
-
-            return new OkObjectResult(data);
-        }
+        }        
 
         [FunctionName("AllPatients")]
         public async Task<IActionResult> GetPatients(
