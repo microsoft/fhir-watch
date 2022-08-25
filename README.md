@@ -7,6 +7,15 @@ FHIRWatch is an MVP Blazor Webassembly static web app for comparing data synchro
 ## Architecture
 A Blazor WebAssembly (wasm) application using the pattern of micro-frontends implemented by lazy-loading UI "modules" only when requested by navigation events from the client.
 
+## FhirWatch Web app
+
+### Patient List
+![fhirwatchPatientList](https://user-images.githubusercontent.com/69863736/186772782-86f7a070-0667-44fc-a8c9-e0fcc9ae21f6.png)
+
+### Compare Patient table
+![fhirwatchComparePatient](https://user-images.githubusercontent.com/69863736/186772861-d795e47c-b4ed-4f52-8678-e327a0c00699.png)
+
+
 ## Get Started
 Here's what you'll need to run this application in your own environment.
 
