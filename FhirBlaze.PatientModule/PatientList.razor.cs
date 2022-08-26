@@ -1,4 +1,4 @@
-﻿using FhirBlaze.PatientModule.models;
+﻿using FhirBlaze.PatientModule.Models;
 using FhirBlaze.SharedComponents.Services;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -16,62 +16,78 @@ namespace FhirBlaze.PatientModule
     [Authorize]
     public partial class PatientList
     {
+        [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
+
         [Inject]
         public NavigationManager navigationManager { get; set; }
         [Inject]
         IFhirService FhirService { get; set; }
-
         [Inject]
         DataverseService DataverseService { get; set; }
+
         protected bool ShowSearch { get; set; } = false;
         protected bool ShowComparison { get; set; } = false;
-        public IDictionary<string, Tuple<Patient, JToken>> PatientsToCompare { get; set; } = new Dictionary<string, Tuple<Patient, JToken>>();
         protected bool Loading { get; set; } = true;
-        
         protected bool ProcessingSearch { get; set; } = false;
-        
         protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
-        
-        protected Patient SelectedPatient { get; set; } = new Patient();
-        [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
-        public IList<Patient> Patients { get; set; } = new List<Patient>();
+        //protected IList<PatientCompareModel> SelectedPatients { get; set; } = new List<PatientCompareModel>();
+        protected List<PatientCompareModel> SelectedPatients => Patients.Where(p => p.IsSelected).ToList();
+
+        public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
 
         protected override async Task OnInitializedAsync()
-        {            
+        {
             Loading = true;
             await base.OnInitializedAsync();
-            Patients = await FhirService.GetPatientsAsync();
-            
-            var fhirId = "d001a1ee-19b9-a072-8ecd-91725f30e09d"; // Adan632 Brekke496
-            var dvPatient = await DataverseService.GetPatientByFhirIdAsync(fhirId);
-            var fhirPatient = Patients.FirstOrDefault(p => p.Id == fhirId);
-            var value = new Tuple<Patient, JToken>(fhirPatient, dvPatient);
-            PatientsToCompare.Add(fhirId, value);
+            var fhirPatients = await FhirService.GetPatientsAsync();
+            var dvPatients = await DataverseService.GetPatients();
+            var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
+            var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
+
+            foreach (var fhirPatient in fhirList)
+            {
+                var matchingDvPatient = dvList.FirstOrDefault(d => d.Id == fhirPatient.Id);
+                Patients.Add(new PatientCompareModel(fhirPatient.Id, fhirPatient, matchingDvPatient));
+            }
+
+            foreach (var dvPatient in dvList)
+            {
+                if (dvPatient.Id == null || !Patients.Any(p => p.Id == dvPatient.Id))
+                {
+                    Patients.Add(new PatientCompareModel(dvPatient.Id, null, dvPatient));
+                }
+            }
 
             Loading = false;
             ShouldRender();
-        }        
+        }
 
         public async Task SearchPatient(Patient patient)
         {
-            ResetSelectedPatient();
-            try
-            {
-                Patients = await FhirService.SearchPatient(patient); //change to patient
-                ProcessingSearch = true;
-                
-                ProcessingSearch = false;
-                ToggleSearch();
-                ShouldRender();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception");
-                Console.WriteLine(e.Message); //manage the cancel search
-            }
+            //ResetSelectedPatient();
+            //try
+            //{
+            //    Patients = await FhirService.SearchPatient(patient); //change to patient
+            //    ProcessingSearch = true;
+
+            //    ProcessingSearch = false;
+            //    ToggleSearch();
+            //    ShouldRender();
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Exception");
+            //    Console.WriteLine(e.Message); //manage the cancel search
+            //}
         }
-        
-        public void ToggleSearch()
+
+        private void ToggleComparison()
+        {
+            if (ShowComparison) ResetSelectedPatient();
+            ShowComparison = !ShowComparison;
+        }
+
+        private void ToggleSearch()
         {
             ShowSearch = !ShowSearch;
             ResetSelectedPatient();
@@ -83,12 +99,38 @@ namespace FhirBlaze.PatientModule
 
         private void ResetSelectedPatient()
         {
-            SelectedPatient = null;
+            Patients.ForEach(p => p.IsSelected = false);
+            //SelectedPatients.Clear();
         }
 
-        private void PatientSelected(EventArgs e, Patient newPatient)
+        private void SelectAll(object isChecked)
         {
-            SelectedPatient = newPatient;            
+            if ((bool)isChecked)
+            {
+                Patients.ForEach(p => p.IsSelected = true);
+            }
+            else
+            {
+                Patients.ForEach(p => p.IsSelected = false);
+            }
+        }
+
+        private void PatientSelected(object isChecked, PatientCompareModel newPatient)
+        {
+            if ((bool)isChecked && !SelectedPatients.Contains(newPatient))
+            {
+                newPatient.IsSelected = true;
+                //SelectedPatients.Add(newPatient);
+            }
+            else
+            {
+                newPatient.IsSelected = false;
+                //if (SelectedPatients.Contains(newPatient))
+                //{
+                //    SelectedPatients.Remove(newPatient);
+                //}
+            }
+            StateHasChanged();
         }
 
         private void NavigateToPatientDetail(EventArgs e, string id)
