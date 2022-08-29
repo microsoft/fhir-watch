@@ -67,11 +67,11 @@ namespace FhirBlaze.PatientModule.Models
             FhirVersion = jObject.SelectToken(".attributes[?(@.key == 'msemr_azurefhirversion')].value")?.ToString();
             Telephone2 = jObject.SelectToken(".attributes[?(@.key == 'telephone2')].value")?.ToString();
             ContactType = jObject.SelectToken(".formattedValues[?(@.key == 'msemr_contacttype')].value")?.ToString();
-            EmailAddress = jObject.SelectToken(".attributes[?(@.key == 'lastname')].value")?.ToString();
-            MobilePhone = jObject.SelectToken(".attributes[?(@.key == 'firstname')].value")?.ToString();
-            Telephone1 = jObject.SelectToken(".attributes[?(@.key == 'birthdate')].value")?.ToString();
-            GeneralPractioner = jObject.SelectToken(".attributes[?(@.key == 'firstname')].value")?.ToString();
-            Address1PostalCode = jObject.SelectToken(".attributes[?(@.key == 'firstname')].value")?.ToString();
+            EmailAddress = jObject.SelectToken(".attributes[?(@.key == 'emailaddress1')].value")?.ToString();
+            MobilePhone = jObject.SelectToken(".attributes[?(@.key == 'mobilephone')].value")?.ToString();
+            Telephone1 = jObject.SelectToken(".attributes[?(@.key == 'telephone1')].value")?.ToString();
+            GeneralPractioner = jObject.SelectToken(".attributes[?(@.key == 'msemr_generalpractioner')].value")?.ToString();
+            Address1PostalCode = jObject.SelectToken(".attributes[?(@.key == 'address1_postalcode')].value")?.ToString();
         }
 
     }

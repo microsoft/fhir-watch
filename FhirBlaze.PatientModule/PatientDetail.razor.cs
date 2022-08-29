@@ -4,9 +4,7 @@ using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
