@@ -3,13 +3,12 @@ using FhirBlaze.SharedComponents.Services;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Authorization;
 using Task = System.Threading.Tasks.Task;
-using Newtonsoft.Json.Linq;
 
 namespace FhirBlaze.PatientModule
 {
@@ -30,7 +29,6 @@ namespace FhirBlaze.PatientModule
         protected bool Loading { get; set; } = true;
         protected bool ProcessingSearch { get; set; } = false;
         protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
-        //protected IList<PatientCompareModel> SelectedPatients { get; set; } = new List<PatientCompareModel>();
         protected List<PatientCompareModel> SelectedPatients => Patients.Where(p => p.IsSelected).ToList();
 
         public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
@@ -83,53 +81,33 @@ namespace FhirBlaze.PatientModule
 
         private void ToggleComparison()
         {
-            if (ShowComparison) ResetSelectedPatient();
             ShowComparison = !ShowComparison;
         }
 
         private void ToggleSearch()
         {
             ShowSearch = !ShowSearch;
-            ResetSelectedPatient();
+            
             if (ShowSearch)
             {
                 DraftPatient = new SimplePatient();
             }
         }
 
-        private void ResetSelectedPatient()
+        private void ClearSelection()
         {
             Patients.ForEach(p => p.IsSelected = false);
-            //SelectedPatients.Clear();
         }
 
         private void SelectAll(object isChecked)
         {
-            if ((bool)isChecked)
-            {
-                Patients.ForEach(p => p.IsSelected = true);
-            }
-            else
-            {
-                Patients.ForEach(p => p.IsSelected = false);
-            }
+            Patients.ForEach(p => p.IsSelected = (bool)isChecked);
         }
 
         private void PatientSelected(object isChecked, PatientCompareModel newPatient)
         {
-            if ((bool)isChecked && !SelectedPatients.Contains(newPatient))
-            {
-                newPatient.IsSelected = true;
-                //SelectedPatients.Add(newPatient);
-            }
-            else
-            {
-                newPatient.IsSelected = false;
-                //if (SelectedPatients.Contains(newPatient))
-                //{
-                //    SelectedPatients.Remove(newPatient);
-                //}
-            }
+            newPatient.IsSelected = (bool)isChecked && !SelectedPatients.Contains(newPatient);
+
             StateHasChanged();
         }
 
