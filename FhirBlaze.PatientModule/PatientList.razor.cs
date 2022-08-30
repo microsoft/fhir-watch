@@ -4,6 +4,7 @@ using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace FhirBlaze.PatientModule
         [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
 
         [Inject]
-        public NavigationManager navigationManager { get; set; }
+        public NavigationManager NavigationManager { get; set; }
         [Inject]
         IFhirService FhirService { get; set; }
         [Inject]
         DataverseService DataverseService { get; set; }
+        [Inject]
+        IJSRuntime JsRuntime { get; set; }
 
         protected bool ShowSearch { get; set; } = false;
         protected bool ShowComparison { get; set; } = false;
@@ -36,6 +39,21 @@ namespace FhirBlaze.PatientModule
 
         protected override async Task OnInitializedAsync()
         {
+            // Try to fetch previously selected filterDate
+            string dateStr = String.Empty;
+            try
+            {
+                dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterDate));
+            }
+            catch (InvalidOperationException)
+            {
+                // do nothing
+            }
+            if (!string.IsNullOrEmpty(dateStr))
+            {
+                FilterDate = DateTime.Parse(dateStr);
+            }
+
             await FetchData();
             ShouldRender();
         }
@@ -93,7 +111,7 @@ namespace FhirBlaze.PatientModule
         private void ToggleSearch()
         {
             ShowSearch = !ShowSearch;
-            
+
             if (ShowSearch)
             {
                 DraftPatient = new SimplePatient();
@@ -108,6 +126,11 @@ namespace FhirBlaze.PatientModule
         private async Task FilterDateChanged(DateTime newDateTime)
         {
             FilterDate = newDateTime;
+
+            // persist selection to localstorage
+            await JsRuntime.InvokeAsync<object>(
+                "stateManager.save", nameof(FilterDate), FilterDate.ToShortDateString());
+
             await FetchData();
             ShouldRender();
         }
@@ -126,7 +149,7 @@ namespace FhirBlaze.PatientModule
 
         private void NavigateToPatientDetail(EventArgs e, string id)
         {
-            navigationManager.NavigateTo($"patient/{id}");
+            NavigationManager.NavigateTo($"patient/{id}");
         }
     }
 }
