@@ -1,0 +1,20 @@
+﻿<div>
+    <label>Date: @Value.ToShortDateString()</label>
+    <input type="date" value="@ValueStr" @onchange="@(e => OnValueChanged(e.Value))"/>
+</div>
+
+@code {
+    private string ValueStr => Value.ToString("yyyy-MM-dd");
+
+    [Parameter]
+    public DateTime Value { get; set; } = DateTime.UtcNow;
+
+    [Parameter]
+    public EventCallback<DateTime> ValueChanged { get; set; }
+
+    protected async Task OnValueChanged(object? newDate)
+    {
+        Value = DateTime.Parse((string)newDate);
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

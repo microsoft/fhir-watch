@@ -28,6 +28,7 @@ namespace FhirBlaze.PatientModule
         protected bool ShowComparison { get; set; } = false;
         protected bool Loading { get; set; } = true;
         protected bool ProcessingSearch { get; set; } = false;
+        protected DateTime FilterDate { get; set; } = DateTime.UtcNow.AddDays(-7);
         protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
         protected List<PatientCompareModel> SelectedPatients => Patients.Where(p => p.IsSelected).ToList();
 
@@ -35,10 +36,16 @@ namespace FhirBlaze.PatientModule
 
         protected override async Task OnInitializedAsync()
         {
+            await FetchData();
+            ShouldRender();
+        }
+
+        protected async Task FetchData()
+        {
             Loading = true;
-            await base.OnInitializedAsync();
+            Patients.Clear();
             var fhirPatients = await FhirService.GetPatientsAsync();
-            var dvPatients = await DataverseService.GetPatients();
+            var dvPatients = await DataverseService.GetPatients(FilterDate);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 
@@ -57,7 +64,6 @@ namespace FhirBlaze.PatientModule
             }
 
             Loading = false;
-            ShouldRender();
         }
 
         public async Task SearchPatient(Patient patient)
@@ -97,6 +103,13 @@ namespace FhirBlaze.PatientModule
         private void ClearSelection()
         {
             Patients.ForEach(p => p.IsSelected = false);
+        }
+
+        private async Task FilterDateChanged(DateTime newDateTime)
+        {
+            FilterDate = newDateTime;
+            await FetchData();
+            ShouldRender();
         }
 
         private void SelectAll(object isChecked)

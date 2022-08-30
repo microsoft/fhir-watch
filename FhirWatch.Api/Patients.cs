@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,13 +47,15 @@ namespace FhirWatch.Api
                 "msemr_azurefhirlastupdatedon",
                 "accountid"
             };
-        }        
+        }
 
         [FunctionName("AllPatients")]
         public async Task<IActionResult> GetPatients(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patients")] HttpRequest req,
             ILogger log)
         {
+            var lastModifiedDT = string.IsNullOrEmpty(req.Query["lastModified"]) ? DateTime.MinValue : DateTime.Parse(req.Query["lastModified"]);
+
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
@@ -77,6 +80,16 @@ namespace FhirWatch.Api
                 }
             };
 
+            if (lastModifiedDT > DateTime.MinValue)
+            {
+                query.Criteria.AddCondition(new ConditionExpression
+                {
+                    AttributeName = "msemr_azurefhirlastupdatedon",
+                    Operator = ConditionOperator.OnOrAfter,
+                    Values = { lastModifiedDT }
+                });
+            }
+
             var resp = await _client.RetrieveMultipleAsync(query);
             return new OkObjectResult(resp.Entities);
         }
@@ -86,7 +99,9 @@ namespace FhirWatch.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patients/{fhirId}")] HttpRequest req,
             string fhirId,
             ILogger log)
-        {            
+        {
+            var lastModifiedDT = string.IsNullOrEmpty(req.Query["lastModified"]) ? DateTime.MinValue : DateTime.Parse(req.Query["lastModified"]);
+
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
@@ -105,6 +120,16 @@ namespace FhirWatch.Api
                     }
                 }
             };
+
+            if (lastModifiedDT > DateTime.MinValue)
+            {
+                query.Criteria.AddCondition(new ConditionExpression
+                {
+                    AttributeName = "msemr_azurefhirlastupdatedon",
+                    Operator = ConditionOperator.OnOrAfter,
+                    Values = { lastModifiedDT }
+                });
+            }
 
             var resp = await _client.RetrieveMultipleAsync(query);
             return new OkObjectResult(resp.Entities.FirstOrDefault());

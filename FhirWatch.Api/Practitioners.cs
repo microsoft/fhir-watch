@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,6 +54,8 @@ namespace FhirWatch.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "practitioners")] HttpRequest req,
             ILogger log)
         {
+            var lastModifiedDT = string.IsNullOrEmpty(req.Query["lastModified"]) ? new DateTime(1900, 1, 1) : DateTime.Parse(req.Query["lastModified"]);
+
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
@@ -72,6 +75,12 @@ namespace FhirWatch.Api
                              * Practitioner - 935000001
                              * Related Person - 935000002
                              */
+                        },
+                        new ConditionExpression
+                        {
+                            AttributeName = "msemr_azurefhirlastupdatedon",
+                            Operator = ConditionOperator.OnOrAfter,
+                            Values = { lastModifiedDT }
                         }
                     }
                 }
@@ -86,7 +95,9 @@ namespace FhirWatch.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "practitioners/{fhirId}")] HttpRequest req,
             string fhirId,
             ILogger log)
-        {            
+        {
+            var lastModifiedDT = string.IsNullOrEmpty(req.Query["lastModified"]) ? new DateTime(1900, 1, 1) : DateTime.Parse(req.Query["lastModified"]);
+
             QueryExpression query = new QueryExpression
             {
                 EntityName = "contact",
@@ -101,6 +112,12 @@ namespace FhirWatch.Api
                             AttributeName = "msemr_azurefhirid",
                             Operator = ConditionOperator.Equal,
                             Values = { fhirId }
+                        },
+                        new ConditionExpression
+                        {
+                            AttributeName = "msemr_azurefhirlastupdatedon",
+                            Operator = ConditionOperator.OnOrAfter,
+                            Values = { lastModifiedDT }
                         }
                     }
                 }

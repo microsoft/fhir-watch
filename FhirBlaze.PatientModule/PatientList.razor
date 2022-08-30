@@ -6,6 +6,7 @@
     <button @onclick="ToggleSearch" class="btn btn-primary">@(ShowSearch ? "Cancel" : "Search Patient")</button>
     <button @onclick="ToggleComparison" class="btn btn-secondary" disabled="@(!SelectedPatients.Any())">@(ShowComparison ? "Cancel" : "Compare Patients")</button>
     <button @onclick="ClearSelection" class="btn btn-secondary" disabled="@(!SelectedPatients.Any() || ShowComparison)">Clear Selection</button>
+    <DateChooser Value="FilterDate" ValueChanged="@(e => FilterDateChanged(e))"/>
 </div>
 
 @if (ShowComparison)
