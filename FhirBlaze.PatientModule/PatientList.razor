@@ -1,4 +1,5 @@
 ﻿@page "/patient"
+@using FhirBlaze.PatientModule.Components
 @using FhirBlaze.SharedComponents
 @using Hl7.Fhir.Model
 
@@ -7,6 +8,7 @@
     <button @onclick="ToggleComparison" class="btn btn-secondary" disabled="@(!SelectedPatients.Any())">@(ShowComparison ? "Cancel" : "Compare Patients")</button>
     <button @onclick="ClearSelection" class="btn btn-secondary" disabled="@(!SelectedPatients.Any() || ShowComparison)">Clear Selection</button>
     <DateChooser Value="FilterDate" ValueChanged="@(e => FilterDateChanged(e))"/>
+    <PatientCount Count="@Patients.Count"/>
 </div>
 
 @if (ShowComparison)
@@ -57,7 +59,7 @@ else
             </div>
 
             <br />
-            <h3>Found: @Patients.Count patients!</h3>
+            
         }
         else
         {

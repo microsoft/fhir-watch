@@ -31,7 +31,20 @@ namespace FhirBlaze.SharedComponents.Services
 
             return result;
         }
-       
+
+        public async Task<IList<Patient>> GetPatientsAsync(DateTime lastModified)
+        {
+            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{lastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
+            var result = new List<Patient>();
+            while (bundle != null)
+            {
+                result.AddRange(bundle.Entry.Select(p => (Patient)p.Resource).ToList());
+                bundle = await _fhirClient.ContinueAsync(bundle);
+            }
+
+            return result;
+        }
+
         public async Task<int> GetPatientCountAsync()
         {
             var bundle = await _fhirClient.SearchAsync<Patient>(summary: SummaryType.Count);

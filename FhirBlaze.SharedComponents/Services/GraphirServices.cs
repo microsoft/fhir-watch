@@ -179,7 +179,10 @@ namespace FhirBlaze.SharedComponents.Services
             return response.Data.WhoAmI ;
         }
 
-
+        Task<IList<Patient>> IFhirService.GetPatientsAsync(System.DateTime lastModified)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
