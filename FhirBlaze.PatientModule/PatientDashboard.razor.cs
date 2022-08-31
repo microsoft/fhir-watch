@@ -1,6 +1,5 @@
 ﻿using FhirBlaze.PatientModule.Models;
 using FhirBlaze.SharedComponents.Services;
-using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -9,38 +8,40 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Task = System.Threading.Tasks.Task;
-
 namespace FhirBlaze.PatientModule
 {
     [Authorize]
-    public partial class PatientList
+    public partial class PatientDashboard
     {
-        [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
-
         [Inject]
         public NavigationManager NavigationManager { get; set; }
+        [CascadingParameter] public Task<AuthenticationState> AuthTask { get; set; }
         [Inject]
         IFhirService FhirService { get; set; }
         [Inject]
         DataverseService DataverseService { get; set; }
         [Inject]
         IJSRuntime JsRuntime { get; set; }
-
-        protected bool ShowSearch { get; set; } = false;
-        protected bool ShowComparison { get; set; } = false;
         protected bool Loading { get; set; } = true;
-        protected bool ProcessingSearch { get; set; } = false;
+
+        // todo: make form model class?
+        protected string FilterId { get; set; } = null;
         protected DateTime FilterDate { get; set; } = DateTime.UtcNow.AddDays(-7);
-        protected SimplePatient DraftPatient { get; set; } = new SimplePatient();
-        protected List<PatientCompareModel> SelectedPatients => Patients.Where(p => p.IsSelected).ToList();
+        protected string FilterFirstName { get; set; } = null;
+        protected string FilterLastName { get; set; } = null;
 
         public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
+        protected int FhirOrphanCount { get; set; }
+        protected int DataverseOrphanCount { get; set; }
+        protected int TotalRecordCount { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             // Try to fetch previously selected filterDate
-            string dateStr = String.Empty;
+            var dateStr = string.Empty;
+
+
+            // todo: pull in other filter states from local storage
             try
             {
                 dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterDate));
@@ -49,19 +50,23 @@ namespace FhirBlaze.PatientModule
             {
                 // do nothing
             }
+
             if (!string.IsNullOrEmpty(dateStr))
             {
                 FilterDate = DateTime.Parse(dateStr);
             }
 
             await FetchData();
+
             ShouldRender();
         }
 
+        // todo: move count logic server side
         protected async Task FetchData()
         {
             Loading = true;
             Patients.Clear();
+
             var fhirPatients = await FhirService.GetPatientsAsync(FilterDate);
             var dvPatients = await DataverseService.GetPatients(FilterDate);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
@@ -81,46 +86,29 @@ namespace FhirBlaze.PatientModule
                 }
             }
 
+            FhirOrphanCount = Patients.Count(p => p.Item1 != null && p.Item2 == null);
+            DataverseOrphanCount = Patients.Count(p => p.Item2 != null && p.Item1 == null);
+            TotalRecordCount = Patients.Count();
+
             Loading = false;
         }
 
-        public async Task SearchPatient(Patient patient)
+        private async Task Search()
         {
-            //ResetSelectedPatient();
-            //try
-            //{
-            //    Patients = await FhirService.SearchPatient(patient); //change to patient
-            //    ProcessingSearch = true;
+            // save filters to local storage
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterId), FilterId);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterFirstName), FilterFirstName);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterLastName), FilterLastName);
 
-            //    ProcessingSearch = false;
-            //    ToggleSearch();
-            //    ShouldRender();
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("Exception");
-            //    Console.WriteLine(e.Message); //manage the cancel search
-            //}
+            // navigate to compare page
+            NavigationManager.NavigateTo("patients");
         }
 
-        private void ToggleComparison()
+        private void ClearFilters()
         {
-            ShowComparison = !ShowComparison;
-        }
-
-        private void ToggleSearch()
-        {
-            ShowSearch = !ShowSearch;
-
-            if (ShowSearch)
-            {
-                DraftPatient = new SimplePatient();
-            }
-        }
-
-        private void ClearSelection()
-        {
-            Patients.ForEach(p => p.IsSelected = false);
+            FilterId = null;
+            FilterFirstName = null;
+            FilterLastName = null;
         }
 
         private async Task FilterDateChanged(DateTime newDateTime)
@@ -130,26 +118,6 @@ namespace FhirBlaze.PatientModule
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
                 "stateManager.save", nameof(FilterDate), FilterDate.ToShortDateString());
-
-            await FetchData();
-            ShouldRender();
-        }
-
-        private void SelectAll(object isChecked)
-        {
-            Patients.ForEach(p => p.IsSelected = (bool)isChecked);
-        }
-
-        private void PatientSelected(object isChecked, PatientCompareModel newPatient)
-        {
-            newPatient.IsSelected = (bool)isChecked && !SelectedPatients.Contains(newPatient);
-
-            StateHasChanged();
-        }
-
-        private void NavigateToPatientDetail(EventArgs e, string id)
-        {
-            NavigationManager.NavigateTo($"patient/{id}");
         }
     }
 }
