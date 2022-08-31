@@ -1,0 +1,9 @@
+﻿@if (Count > 0) 
+{
+<h3>Found: @Count records.</h3>
+}
+
+@code {
+    [Parameter]
+    public int Count { get; set; }
+}
