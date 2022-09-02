@@ -1,0 +1,65 @@
+﻿@page "/patient-dashboard"
+@using FhirBlaze.PatientModule.Components
+@using FhirBlaze.SharedComponents
+@using Hl7.Fhir.Model
+
+<h2>
+    Patient Dashboard Sync
+</h2>
+
+@if (Loading)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <form class="form">
+                <div class="form-group">
+                    <label>All Records</label> @*todo: make links to specialized searches*@
+                    <span>@TotalRecordCount</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Orphan FHIR Records</label>
+                    <span>@FhirOrphanCount</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Orphan Dataverse Records</label>
+                    <span>@DataverseOrphanCount</span>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="form">
+                <div class="form-group">
+                    <label for="id">FHIR ID</label>
+                    <input name="id" typeof="text" @bind="FilterId" />
+                </div>
+
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input name="firstName" typeof="text" @bind="FilterFirstName" />
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input name="lastName" typeof="text" @bind="FilterLastName" />
+                </div>
+
+                <div class="form-group">
+                    <label>Last Updated Date</label>
+                    <DateChooser Value="FilterDate" ValueChanged="@(e => FilterDateChanged(e))" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" @onclick="Search" class="btn btn-primary">Search</button>
+                    <button type="reset" @onclick="ClearFilters" class="btn btn-secondary">Clear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

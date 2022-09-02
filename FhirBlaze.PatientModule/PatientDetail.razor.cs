@@ -46,7 +46,7 @@ namespace FhirBlaze.PatientModule
         }
         private void NavigateToPatientList()
         {
-            navigationManager.NavigateTo("patient");
+            navigationManager.NavigateTo("patients");
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿<h3>Compare Patients</h3>
+﻿@page "/patients"
+<h3>Compare Patients</h3>
 
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover">
         <thead class="thead-dark">
             <tr>
+                <th scope="col" rowspan="2" class="text-center" style="vertical-align: middle">Actions</th>
                 <th scope="col" rowspan="2" class="text-center" style="vertical-align: middle">Id</th>
                 <th scope="col" colspan="2" class="text-center">FirstName</th>
                 <th scope="col" colspan="2" class="text-center">LastName</th>
@@ -49,6 +51,7 @@
             @foreach (var patientPair in Patients)
             {
                 <tr>
+                    <th scope="row"><button @onclick="@(e => NavigateToPatientDetail(e, patientPair.Item1?.Id))" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span></button></th>
                     <th scope="row">@patientPair.Item1?.Id</th>
                     <th>@patientPair.Item1?.FirstName</th>
                     <th>@patientPair.Item2?.FirstName</th>
