@@ -85,6 +85,10 @@ namespace FhirBlaze.SharedComponents
             Id = id;
             LayerId = layerId;
 
+
+            if (jToken == null)
+                return;
+
             var parent = jToken.Parent as JProperty;
             Name = name ?? parent?.Name ?? $"[{id}]";
 
