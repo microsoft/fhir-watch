@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 namespace FhirBlaze.PatientModule
 {
     [Authorize]
@@ -26,7 +27,8 @@ namespace FhirBlaze.PatientModule
 
         // todo: make form model class?
         protected string FilterId { get; set; } = null;
-        protected DateTime FilterDate { get; set; } = DateTime.UtcNow.AddDays(-7);
+        protected DateTime FilterStartDate { get; set; } = DateTime.UtcNow.AddDays(-7);
+        protected DateTime FilterEndDate { get; set; } = DateTime.UtcNow;
         protected string FilterFirstName { get; set; } = null;
         protected string FilterLastName { get; set; } = null;
 
@@ -37,24 +39,17 @@ namespace FhirBlaze.PatientModule
 
         protected override async Task OnInitializedAsync()
         {
-            // Try to fetch previously selected filterDate
-            var dateStr = string.Empty;
-
-
-            // todo: pull in other filter states from local storage
             try
             {
-                dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterDate));
+                FilterStartDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterStartDate));
             }
-            catch (InvalidOperationException)
-            {
-                // do nothing
-            }
+            catch (InvalidOperationException) { /* do nothing */ }
 
-            if (!string.IsNullOrEmpty(dateStr))
+            try
             {
-                FilterDate = DateTime.Parse(dateStr);
+                FilterEndDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterEndDate));
             }
+            catch (InvalidOperationException) { /* do nothing */ }
 
             await FetchData();
 
@@ -67,8 +62,8 @@ namespace FhirBlaze.PatientModule
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(FilterDate);
-            var dvPatients = await DataverseService.GetPatients(FilterDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(FilterStartDate, FilterEndDate);
+            var dvPatients = await DataverseService.GetPatients(FilterStartDate, FilterEndDate);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 

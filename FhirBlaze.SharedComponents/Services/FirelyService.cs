@@ -32,9 +32,9 @@ namespace FhirBlaze.SharedComponents.Services
             return result;
         }
 
-        public async Task<IList<Patient>> GetPatientsAsync(DateTime lastModified)
+        public async Task<IList<Patient>> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
-            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{lastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
+            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{startLastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
             var result = new List<Patient>();
             while (bundle != null)
             {

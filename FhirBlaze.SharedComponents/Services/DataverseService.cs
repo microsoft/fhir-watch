@@ -24,9 +24,9 @@ namespace FhirBlaze.SharedComponents.Services
             return JObject.Parse(result);
         }
 
-        public async Task<JObject> GetPatientByFhirIdAsync(string fhirId, DateTime lastModified)
+        public async Task<JObject> GetPatientByFhirIdAsync(string fhirId, DateTime startLastModified, DateTime endLastModified)
         {
-            var result = await http.GetStringAsync($"patients/{fhirId}?lastModified={lastModified.ToShortDateString()}");
+            var result = await http.GetStringAsync($"patients/{fhirId}?startLastModified={startLastModified.ToShortDateString()}&endLastModified={endLastModified.ToShortDateString()}");
 
             if (string.IsNullOrWhiteSpace(result))
                 return null;

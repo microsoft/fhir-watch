@@ -1,5 +1,5 @@
-﻿using Hl7.Fhir.ElementModel.Types;
-using Hl7.Fhir.Model;
+﻿using Hl7.Fhir.Model;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,12 +7,12 @@ namespace FhirBlaze.SharedComponents.Services
 {
     public interface IFhirService
     {
-        Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Hl7.Fhir.Model.Resource, new();
+        Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Resource, new();
 
         #region Patient
         Task<Patient> CreatePatientsAsync(Patient patient);
         Task<IList<Patient>> GetPatientsAsync();
-        Task<IList<Patient>> GetPatientsAsync(System.DateTime lastModified);
+        Task<IList<Patient>> GetPatientsAsync(DateTime lastModified);
         Task<Patient> UpdatePatientAsync(string patientId, Patient patient);
         Task<int> GetPatientCountAsync();
         Task<IList<Patient>> SearchPatient(Patient patient);
