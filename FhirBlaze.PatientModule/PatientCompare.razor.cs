@@ -1,4 +1,5 @@
 ﻿using FhirBlaze.PatientModule.Models;
+using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -24,44 +25,42 @@ namespace FhirBlaze.PatientModule
         [Parameter]
         public IList<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected bool Loading { get; set; } = true;
-        protected DateTime FilterStartDate { get; set; } = DateTime.UtcNow.AddDays(-7);
-        protected DateTime FilterEndDate { get; set; } = DateTime.UtcNow;
-
+        protected PatientFilters Filters { get; set; } = new PatientFilters();
 
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterStartDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.StartDate));
                 if (DateTime.TryParse(str, out DateTime date))
-                    FilterStartDate = date;
+                    Filters.StartDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
 
             try
             {
-                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterEndDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.EndDate));
                 if (DateTime.TryParse(str, out DateTime date))
-                    FilterEndDate = date;
+                    Filters.EndDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
 
             // some issues with awaiting a task
-            await FetchData(FilterStartDate, FilterEndDate);
+            await FetchData();
 
             ShouldRender();
         }
 
         // todo: move count logic server side
-        protected async Task FetchData(DateTime startFilterDate, DateTime endFilterDate)
+        protected async Task FetchData()
         {
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(startFilterDate, endFilterDate);
-            var dvPatients = await DataverseService.GetPatients(startFilterDate, endFilterDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(Filters);
+            var dvPatients = await DataverseService.GetPatientsAsync(Filters);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 

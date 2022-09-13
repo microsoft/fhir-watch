@@ -48,27 +48,27 @@ else
                         <div class="form-group row">
                             <label for="id" class="col-sm-8 col-form-label">FHIR ID:</label>
                             <div class="col-sm-8">
-                                <input name="id" typeof="text" @bind="FilterId" />
+                                <input name="id" typeof="text" @bind="Filters.FhirId" />
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label for="firstName" class="col-sm-8 col-form-label">First Name:</label>
                             <div class="col-sm-8">
-                                <input name="firstName" typeof="text" @bind="FilterFirstName" />
+                                <input name="firstName" typeof="text" @bind="Filters.FirstName" />
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label for="lastName" class="col-sm-8 col-form-label">Last Name:</label>
                             <div class="col-sm-8">
-                                <input name="lastName" typeof="text" @bind="FilterLastName" />
+                                <input name="lastName" typeof="text" @bind="Filters.LastName" />
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <DateChooser Label="Last modified on or after" Value="FilterStartDate" ValueChanged="@(e => StartFilterDateChanged(e))" />
-                        <DateChooser Label="Last modified on or before" Value="FilterEndDate" ValueChanged="@(e => EndFilterDateChanged(e))" />
+                        <DateChooser Label="Last modified on or after" Value="Filters.StartDate" ValueChanged="@(e => StartFilterDateChanged(e))" />
+                        <DateChooser Label="Last modified on or before" Value="Filters.EndDate" ValueChanged="@(e => EndFilterDateChanged(e))" />
                     </div>
                 </div>
                 <div class="form-group row">

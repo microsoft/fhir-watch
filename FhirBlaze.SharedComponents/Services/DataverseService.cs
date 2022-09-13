@@ -51,7 +51,17 @@ namespace FhirBlaze.SharedComponents.Services
         /// <returns></returns>
         public async Task<JArray> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
-            var results = await http.GetStringAsync($"patients?startLastModified={startLastModified.ToShortDateString()}&endLastModified={endLastModified.ToShortDateString()}");
+            return await GetPatientsAsync(new PatientFilters { StartDate = startLastModified, EndDate = endLastModified });
+        }
+
+        /// <summary>
+        /// Get a list of all Patients matching <see cref="PatientFilters"/> criteria.
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync(PatientFilters filters)
+        {
+            var results = await http.GetStringAsync($"patients?startLastModified={filters.StartDate.ToShortDateString()}&endLastModified={filters.EndDate.ToShortDateString()}");
 
             if (string.IsNullOrWhiteSpace(results))
                 return null;

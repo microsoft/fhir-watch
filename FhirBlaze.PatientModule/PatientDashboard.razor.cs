@@ -1,4 +1,5 @@
 ﻿using FhirBlaze.PatientModule.Models;
+using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -25,12 +26,7 @@ namespace FhirBlaze.PatientModule
         IJSRuntime JsRuntime { get; set; }
         protected bool Loading { get; set; } = true;
 
-        // todo: make form model class?
-        protected string FilterId { get; set; } = null;
-        protected DateTime FilterStartDate { get; set; } = DateTime.UtcNow.AddDays(-7);
-        protected DateTime FilterEndDate { get; set; } = DateTime.UtcNow;
-        protected string FilterFirstName { get; set; } = null;
-        protected string FilterLastName { get; set; } = null;
+        protected PatientFilters Filters { get; set; } = new PatientFilters();
 
         public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected int FhirOrphanCount { get; set; }
@@ -41,18 +37,18 @@ namespace FhirBlaze.PatientModule
         {
             try
             {
-                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterStartDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.StartDate));
                 if (DateTime.TryParse(str, out DateTime date))
-                    FilterStartDate = date;
+                    Filters.StartDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
             
             try
             {
-                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterEndDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.EndDate));
                 if (DateTime.TryParse(str, out DateTime date))
-                    FilterEndDate = date;
+                    Filters.EndDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
@@ -68,8 +64,8 @@ namespace FhirBlaze.PatientModule
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(FilterStartDate, FilterEndDate);
-            var dvPatients = await DataverseService.GetPatientsAsync(FilterStartDate, FilterEndDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(Filters);
+            var dvPatients = await DataverseService.GetPatientsAsync(Filters);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 
@@ -97,9 +93,9 @@ namespace FhirBlaze.PatientModule
         private async Task Search()
         {
             // save filters to local storage
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterId), FilterId);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterFirstName), FilterFirstName);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterLastName), FilterLastName);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FhirId), Filters.FhirId);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FirstName), Filters.FirstName);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.LastName), Filters.LastName);
 
             // navigate to compare page
             NavigationManager.NavigateTo("patients");
@@ -107,27 +103,25 @@ namespace FhirBlaze.PatientModule
 
         private void ClearFilters()
         {
-            FilterId = null;
-            FilterFirstName = null;
-            FilterLastName = null;
+            Filters = new PatientFilters();
         }
 
         private async Task StartFilterDateChanged(DateTime newDateTime)
         {
-            FilterStartDate = newDateTime;
+            Filters.StartDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(FilterStartDate), FilterStartDate.ToShortDateString());
+                "stateManager.save", nameof(Filters.StartDate), Filters.StartDate.ToShortDateString());
         }
 
         private async Task EndFilterDateChanged(DateTime newDateTime)
         {
-            FilterEndDate = newDateTime;
+            Filters.EndDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(FilterEndDate), FilterEndDate.ToShortDateString());
+                "stateManager.save", nameof(Filters.EndDate), Filters.EndDate.ToShortDateString());
         }
     }
 }
