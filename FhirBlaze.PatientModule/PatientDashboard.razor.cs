@@ -106,13 +106,22 @@ namespace FhirBlaze.PatientModule
             FilterLastName = null;
         }
 
-        private async Task FilterDateChanged(DateTime newDateTime)
+        private async Task StartFilterDateChanged(DateTime newDateTime)
         {
-            FilterDate = newDateTime;
+            FilterStartDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(FilterDate), FilterDate.ToShortDateString());
+                "stateManager.save", nameof(FilterStartDate), FilterStartDate.ToShortDateString());
+        }
+
+        private async Task EndFilterDateChanged(DateTime newDateTime)
+        {
+            FilterEndDate = newDateTime;
+
+            // persist selection to localstorage
+            await JsRuntime.InvokeAsync<object>(
+                "stateManager.save", nameof(FilterEndDate), FilterEndDate.ToShortDateString());
         }
     }
 }

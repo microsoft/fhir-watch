@@ -22,7 +22,9 @@ namespace FhirBlaze.SharedComponents.Services
         public async Task<IList<Patient>> GetPatientsAsync()
         {
             var bundle = await _fhirClient.SearchAsync<Patient>(pageSize: 50);
+            
             var result = new List<Patient>();
+
             while (bundle != null)
             {
                 result.AddRange(bundle.Entry.Select(p => (Patient)p.Resource).ToList());
@@ -34,8 +36,10 @@ namespace FhirBlaze.SharedComponents.Services
 
         public async Task<IList<Patient>> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
-            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{startLastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
+            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{startLastModified.ToString("yyyy-MM-dd")}&_lastUpdated=lt{endLastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
+
             var result = new List<Patient>();
+
             while (bundle != null)
             {
                 result.AddRange(bundle.Entry.Select(p => (Patient)p.Resource).ToList());

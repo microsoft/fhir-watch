@@ -24,37 +24,38 @@ namespace FhirBlaze.PatientModule
         [Parameter]
         public IList<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected bool Loading { get; set; } = true;
+        protected DateTime FilterStartDate { get; set; } = DateTime.UtcNow.AddDays(-7);
+        protected DateTime FilterEndDate { get; set; } = DateTime.UtcNow;
 
 
         protected override async Task OnInitializedAsync()
         {
-            var dateStr = string.Empty;
+            try
+            {
+                FilterStartDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterStartDate));
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
 
             try
             {
-                dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", "FilterDate");
+                FilterEndDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterEndDate));
             }
-            catch (InvalidOperationException)
-            {
-                // do nothing
-            }
-
-            var date = !string.IsNullOrEmpty(dateStr) ? DateTime.Parse(dateStr) : DateTime.UtcNow.AddDays(-7);
+            catch (InvalidOperationException) { /* do nothing */ }
 
             // some issues with awaiting a task
-            await FetchData(date);
+            await FetchData(FilterStartDate, FilterEndDate);
 
             ShouldRender();
         }
 
         // todo: move count logic server side
-        protected async Task FetchData(DateTime filterDate)
+        protected async Task FetchData(DateTime startFilterDate, DateTime endFilterDate)
         {
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(filterDate);
-            var dvPatients = await DataverseService.GetPatients(filterDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(startFilterDate, endFilterDate);
+            var dvPatients = await DataverseService.GetPatients(startFilterDate, endFilterDate);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 

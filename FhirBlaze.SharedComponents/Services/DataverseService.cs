@@ -24,16 +24,6 @@ namespace FhirBlaze.SharedComponents.Services
             return JObject.Parse(result);
         }
 
-        public async Task<JObject> GetPatientByFhirIdAsync(string fhirId, DateTime startLastModified, DateTime endLastModified)
-        {
-            var result = await http.GetStringAsync($"patients/{fhirId}?startLastModified={startLastModified.ToShortDateString()}&endLastModified={endLastModified.ToShortDateString()}");
-
-            if (string.IsNullOrWhiteSpace(result))
-                return null;
-
-            return JObject.Parse(result);
-        }
-
         public async Task<JArray> GetPatients()
         {
             var results = await http.GetStringAsync($"patients");
@@ -44,9 +34,9 @@ namespace FhirBlaze.SharedComponents.Services
             return JArray.Parse(results);
         }
 
-        public async Task<JArray> GetPatients(DateTime lastModified)
+        public async Task<JArray> GetPatients(DateTime startLastModified, DateTime endLastModified)
         {
-            var results = await http.GetStringAsync($"patients?lastModified={lastModified.ToShortDateString()}");
+            var results = await http.GetStringAsync($"patients?startLastModified={startLastModified.ToShortDateString()}&endLastModified={endLastModified.ToShortDateString()}");
 
             if (string.IsNullOrWhiteSpace(results))
                 return null;

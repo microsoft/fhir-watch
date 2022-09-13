@@ -12,7 +12,7 @@ namespace FhirBlaze.SharedComponents.Services
         #region Patient
         Task<Patient> CreatePatientsAsync(Patient patient);
         Task<IList<Patient>> GetPatientsAsync();
-        Task<IList<Patient>> GetPatientsAsync(DateTime lastModified);
+        Task<IList<Patient>> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified);
         Task<Patient> UpdatePatientAsync(string patientId, Patient patient);
         Task<int> GetPatientCountAsync();
         Task<IList<Patient>> SearchPatient(Patient patient);
