@@ -41,15 +41,21 @@ namespace FhirBlaze.PatientModule
         {
             try
             {
-                FilterStartDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterStartDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterStartDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    FilterStartDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
-
+            catch (JSException) { /* do nothing */ }
+            
             try
             {
-                FilterEndDate = await JsRuntime.InvokeAsync<DateTime>("stateManager.load", nameof(FilterEndDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterEndDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    FilterEndDate = date;
             }
             catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
 
             await FetchData();
 
