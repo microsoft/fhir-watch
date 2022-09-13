@@ -69,7 +69,7 @@ namespace FhirBlaze.PatientModule
             Patients.Clear();
 
             var fhirPatients = await FhirService.GetPatientsAsync(FilterStartDate, FilterEndDate);
-            var dvPatients = await DataverseService.GetPatients(FilterStartDate, FilterEndDate);
+            var dvPatients = await DataverseService.GetPatientsAsync(FilterStartDate, FilterEndDate);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 

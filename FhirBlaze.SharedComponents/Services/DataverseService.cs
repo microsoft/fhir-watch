@@ -14,6 +14,11 @@ namespace FhirBlaze.SharedComponents.Services
             this.http = http;
         }
 
+        /// <summary>
+        /// Get Patient by FHIR Id.
+        /// </summary>
+        /// <param name="fhirId"></param>
+        /// <returns></returns>
         public async Task<JObject> GetPatientByFhirIdAsync(string fhirId)
         {
             var result = await http.GetStringAsync($"patients/{fhirId}");
@@ -24,7 +29,11 @@ namespace FhirBlaze.SharedComponents.Services
             return JObject.Parse(result);
         }
 
-        public async Task<JArray> GetPatients()
+        /// <summary>
+        /// Get a list of all Patients.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync()
         {
             var results = await http.GetStringAsync($"patients");
 
@@ -34,7 +43,13 @@ namespace FhirBlaze.SharedComponents.Services
             return JArray.Parse(results);
         }
 
-        public async Task<JArray> GetPatients(DateTime startLastModified, DateTime endLastModified)
+        /// <summary>
+        /// Get a list of all Patients where lastModified date is between startLastModified and endLastModified.
+        /// </summary>
+        /// <param name="startLastModified"></param>
+        /// <param name="endLastModified"></param>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
             var results = await http.GetStringAsync($"patients?startLastModified={startLastModified.ToShortDateString()}&endLastModified={endLastModified.ToShortDateString()}");
 
