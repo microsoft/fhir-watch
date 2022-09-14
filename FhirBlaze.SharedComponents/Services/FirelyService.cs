@@ -43,17 +43,21 @@ namespace FhirBlaze.SharedComponents.Services
         {
             Bundle bundle = new();
             var result = new List<Patient>();
-            var qryStringFilters = new[]
-            {
-                $"_lastUpdated=gt{patientFilters.StartDate:yyyy-MM-dd}",
-                $"_lastUpdated=lt{patientFilters.EndDate:yyyy-MM-dd}"
-            };
+            var qryStringFilters = new List<string>();
+
+            if (!string.IsNullOrEmpty(patientFilters.FhirId)) // todo: fix
+                qryStringFilters.Add($"_id={patientFilters.FhirId}");
             if (!string.IsNullOrEmpty(patientFilters.LastName))
-            {
-                qryStringFilters.Append("family:contains={familyName}");
-            }
-            
-            bundle = await _fhirClient.SearchAsync<Patient>(criteria: qryStringFilters, pageSize: 50);
+                qryStringFilters.Add($"family:contains={patientFilters.LastName}");
+            if(!string.IsNullOrEmpty(patientFilters.FirstName)) // todo: fix
+                qryStringFilters.Add($"given:contains={patientFilters.FirstName}");
+
+            if (!qryStringFilters.Any())
+                qryStringFilters.AddRange(new[] {
+                $"_lastUpdated=gt{patientFilters.StartDate:yyyy-MM-dd}",
+                $"_lastUpdated=lt{patientFilters.EndDate:yyyy-MM-dd}" });
+
+            bundle = await _fhirClient.SearchAsync<Patient>(criteria: qryStringFilters.ToArray(), pageSize: 50);
 
             while (bundle != null)
             {

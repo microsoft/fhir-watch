@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -61,12 +63,38 @@ namespace FhirBlaze.SharedComponents.Services
         /// <returns></returns>
         public async Task<JArray> GetPatientsAsync(PatientFilters filters)
         {
-            var results = await http.GetStringAsync($"patients?startLastModified={filters.StartDate.ToShortDateString()}&endLastModified={filters.EndDate.ToShortDateString()}");
+            try
+            {
+                var queryStr = "patients";
 
-            if (string.IsNullOrWhiteSpace(results))
-                return null;
+                var qryStringFilters = new List<string>();
 
-            return JArray.Parse(results);
+                if (!string.IsNullOrEmpty(filters.FhirId)) // todo: fix
+                    qryStringFilters.Add($"fhirId={filters.FhirId}");
+                if (!string.IsNullOrEmpty(filters.LastName))
+                    qryStringFilters.Add($"lastName={filters.LastName}");
+                if (!string.IsNullOrEmpty(filters.FirstName)) // todo: fix
+                    qryStringFilters.Add($"firstName={filters.FirstName}");
+
+                if (!qryStringFilters.Any())
+                    qryStringFilters.AddRange(new[] {
+                $"startDate={filters.StartDate:yyyy-MM-dd}",
+                $"endDate={filters.EndDate:yyyy-MM-dd}" });
+
+                if (qryStringFilters.Any())
+                    queryStr = queryStr + "?" + string.Join('&', qryStringFilters.ToArray());
+
+                var results = await http.GetStringAsync(queryStr);
+
+                if (string.IsNullOrWhiteSpace(results))
+                    return null;
+
+                return JArray.Parse(results);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

@@ -54,20 +54,25 @@ namespace FhirWatch.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patients")] HttpRequest req,
             ILogger log)
         {
-
-            var startLastModifiedDT = string.IsNullOrEmpty(req.Query["startLastModified"]) ?
-                DateTime.MinValue : DateTime.Parse(req.Query["startLastModified"]);
-            var endLastModifiedDT = string.IsNullOrEmpty(req.Query["endLastModified"]) ?
-                DateTime.UtcNow : DateTime.Parse(req.Query["endLastModified"]);
-
-            QueryExpression query = new QueryExpression
+            try
             {
-                EntityName = "contact",
-                ColumnSet = new ColumnSet(columnNames.ToArray()),
-                Criteria = new FilterExpression
+                var startLastModifiedDT = string.IsNullOrEmpty(req.Query["startDate"]) ?
+                    DateTime.MinValue : DateTime.Parse(req.Query["startDate"]);
+                var endLastModifiedDT = string.IsNullOrEmpty(req.Query["endDate"]) ?
+                    DateTime.UtcNow : DateTime.Parse(req.Query["endDate"]);
+
+                var fhirId = req.Query["fhirId"].ToString();
+                var firstName = req.Query["firstName"].ToString();
+                var lastName = req.Query["lastName"].ToString();
+
+                QueryExpression query = new QueryExpression
                 {
-                    FilterOperator = LogicalOperator.And,
-                    Conditions =
+                    EntityName = "contact",
+                    ColumnSet = new ColumnSet(columnNames.ToArray()),
+                    Criteria = new FilterExpression
+                    {
+                        FilterOperator = LogicalOperator.And,
+                        Conditions =
                     {
                         new ConditionExpression
                         {
@@ -81,31 +86,68 @@ namespace FhirWatch.Api
                              */
                         }
                     }
+                    }
+                };
+
+                if (!string.IsNullOrEmpty(fhirId))
+                {
+                    query.Criteria.AddCondition(new ConditionExpression
+                    {
+                        AttributeName = "msemr_azurefhirid",
+                        Operator = ConditionOperator.Equal,
+                        Values = { startLastModifiedDT }
+                    });
                 }
-            };
 
-            if (startLastModifiedDT > DateTime.MinValue)
-            {
-                query.Criteria.AddCondition(new ConditionExpression
+                if (!string.IsNullOrEmpty(firstName))
                 {
-                    AttributeName = "msemr_azurefhirlastupdatedon",
-                    Operator = ConditionOperator.OnOrAfter,
-                    Values = { startLastModifiedDT }
-                });
-            }
+                    query.Criteria.AddCondition(new ConditionExpression
+                    {
+                        AttributeName = "firstname",
+                        Operator = ConditionOperator.Like,
+                        Values = { startLastModifiedDT }
+                    });
+                }
 
-            if (endLastModifiedDT > DateTime.UtcNow)
-            {
-                query.Criteria.AddCondition(new ConditionExpression
+                if (!string.IsNullOrEmpty(lastName))
                 {
-                    AttributeName = "msemr_azurefhirlastupdatedon",
-                    Operator = ConditionOperator.OnOrBefore,
-                    Values = { endLastModifiedDT }
-                });
-            }
+                    query.Criteria.AddCondition(new ConditionExpression
+                    {
+                        AttributeName = "lastname",
+                        Operator = ConditionOperator.Like,
+                        Values = { startLastModifiedDT }
+                    });
+                }
 
-            var resp = await _client.RetrieveMultipleAsync(query);
-            return new OkObjectResult(resp.Entities);
+                if (query?.Criteria?.Conditions?.Count <= 1 || startLastModifiedDT > DateTime.MinValue)
+                {
+                    query.Criteria.AddCondition(new ConditionExpression
+                    {
+                        AttributeName = "msemr_azurefhirlastupdatedon",
+                        Operator = ConditionOperator.OnOrAfter,
+                        Values = { startLastModifiedDT }
+                    });
+
+                    if (endLastModifiedDT > DateTime.UtcNow)
+                    {
+                        query.Criteria.AddCondition(new ConditionExpression
+                        {
+                            AttributeName = "msemr_azurefhirlastupdatedon",
+                            Operator = ConditionOperator.OnOrBefore,
+                            Values = { endLastModifiedDT }
+                        });
+                    }
+                }
+
+                var resp = await _client.RetrieveMultipleAsync(query);
+
+                return new OkObjectResult(resp.Entities);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         [FunctionName("PatientById")]
@@ -114,7 +156,7 @@ namespace FhirWatch.Api
             string fhirId,
             ILogger log)
         {
-            var startLastModifiedDT = string.IsNullOrEmpty(req.Query["startLastModified"]) ? 
+            var startLastModifiedDT = string.IsNullOrEmpty(req.Query["startLastModified"]) ?
                 DateTime.MinValue : DateTime.Parse(req.Query["startLastModified"]);
             var endLastModifiedDT = string.IsNullOrEmpty(req.Query["endLastModified"]) ?
                 DateTime.UtcNow : DateTime.Parse(req.Query["endLastModified"]);

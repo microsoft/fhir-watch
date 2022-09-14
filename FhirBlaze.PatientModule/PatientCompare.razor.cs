@@ -47,6 +47,30 @@ namespace FhirBlaze.PatientModule
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
 
+            try
+            {
+                Filters.FirstName = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.FirstName));
+                Filters.FirstName = Filters.FirstName == "null" ? null : Filters.FirstName;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+
+            try
+            {
+                Filters.LastName = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.LastName));
+                Filters.LastName = Filters.LastName == "null" ? null : Filters.LastName;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+
+            try
+            {
+                Filters.FhirId = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.FhirId));
+                Filters.FhirId = Filters.FhirId == "null" ? null : Filters.FhirId;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+
             // some issues with awaiting a task
             await FetchData();
 

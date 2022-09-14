@@ -123,5 +123,12 @@ namespace FhirBlaze.PatientModule
             await JsRuntime.InvokeAsync<object>(
                 "stateManager.save", nameof(Filters.EndDate), Filters.EndDate.ToShortDateString());
         }
+
+        private bool DisableDates()
+        {
+            return !string.IsNullOrWhiteSpace(Filters.FirstName)
+                || !string.IsNullOrWhiteSpace(Filters.LastName)
+                || !string.IsNullOrWhiteSpace(Filters.FhirId);
+        }
     }
 }

@@ -67,8 +67,8 @@ else
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <DateChooser Label="Last modified on or after" Value="Filters.StartDate" ValueChanged="@(e => StartFilterDateChanged(e))" />
-                        <DateChooser Label="Last modified on or before" Value="Filters.EndDate" ValueChanged="@(e => EndFilterDateChanged(e))" />
+                        <DateChooser Label="Last modified on or after" Value="Filters.StartDate" ValueChanged="@(e => StartFilterDateChanged(e))" Disabled="@DisableDates()" />
+                        <DateChooser Label="Last modified on or before" Value="Filters.EndDate" ValueChanged="@(e => EndFilterDateChanged(e))" Disabled="@DisableDates()" />
                     </div>
                 </div>
                 <div class="form-group row">
