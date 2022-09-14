@@ -22,7 +22,9 @@ namespace FhirBlaze.SharedComponents.Services
         public async Task<IList<Patient>> GetPatientsAsync()
         {
             var bundle = await _fhirClient.SearchAsync<Patient>(pageSize: 50);
+
             var result = new List<Patient>();
+
             while (bundle != null)
             {
                 result.AddRange(bundle.Entry.Select(p => (Patient)p.Resource).ToList());
@@ -32,10 +34,31 @@ namespace FhirBlaze.SharedComponents.Services
             return result;
         }
 
-        public async Task<IList<Patient>> GetPatientsAsync(DateTime lastModified)
+        public async Task<IList<Patient>> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
-            var bundle = await _fhirClient.SearchAsync<Patient>(new[] { $"_lastUpdated=gt{lastModified.ToString("yyyy-MM-dd")}" }, pageSize: 50);
+            return await GetPatientsAsync(new PatientFilters { StartDate = startLastModified, EndDate = endLastModified });
+        }
+
+        public async Task<IList<Patient>> GetPatientsAsync(PatientFilters patientFilters)
+        {
+            Bundle bundle = new();
             var result = new List<Patient>();
+            var qryStringFilters = new List<string>();
+
+            if (!string.IsNullOrEmpty(patientFilters.FhirId)) // todo: fix
+                qryStringFilters.Add($"_id={patientFilters.FhirId}");
+            if (!string.IsNullOrEmpty(patientFilters.LastName))
+                qryStringFilters.Add($"family:contains={patientFilters.LastName}");
+            if(!string.IsNullOrEmpty(patientFilters.FirstName)) // todo: fix
+                qryStringFilters.Add($"given:contains={patientFilters.FirstName}");
+
+            if (!qryStringFilters.Any())
+                qryStringFilters.AddRange(new[] {
+                $"_lastUpdated=gt{patientFilters.StartDate:yyyy-MM-dd}",
+                $"_lastUpdated=lt{patientFilters.EndDate:yyyy-MM-dd}" });
+
+            bundle = await _fhirClient.SearchAsync<Patient>(criteria: qryStringFilters.ToArray(), pageSize: 50);
+
             while (bundle != null)
             {
                 result.AddRange(bundle.Entry.Select(p => (Patient)p.Resource).ToList());
@@ -51,16 +74,7 @@ namespace FhirBlaze.SharedComponents.Services
             return bundle.Total ?? 0;
         }
 
-        public async Task<IList<Questionnaire>> SearchQuestionnaire(string title)
-        {
-            Bundle bundle=new Bundle(); 
-            if (!string.IsNullOrEmpty(title))
-            {
-                bundle = await _fhirClient.SearchAsync<Questionnaire>(criteria: new[] { $"title:contains={title}" });                  
-            }
-            return bundle.Entry.Select(p => (Questionnaire)p.Resource).ToList();
-
-        }
+        
         public async Task<IList<Patient>> SearchPatient(Patient Patient)
         {
             string givenName = ""; //The given name is not working on the mapping
@@ -84,10 +98,10 @@ namespace FhirBlaze.SharedComponents.Services
                     return bundle.Entry.Select(p => (Patient)p.Resource).ToList();
             }
 
-            return await GetPatientsAsync();           
+            return await GetPatientsAsync();
         }
 
-        public async Task<Patient> CreatePatientsAsync(Patient patient)
+        public async Task<Patient> CreatePatientAsync(Patient patient)
         {
             return await _fhirClient.CreateAsync(patient);
         }
@@ -101,70 +115,7 @@ namespace FhirBlaze.SharedComponents.Services
 
             return await _fhirClient.UpdateAsync(patient);
         }
-        #endregion
-
-        #region Questionnaire
-        public async Task<IList<Questionnaire>> GetQuestionnairesAsync()
-        {
-            var bundle = await _fhirClient.SearchAsync<Questionnaire>(pageSize: 100);
-            var results = new List<Questionnaire>();
-
-            while (bundle != null)
-            {
-                results.AddRange(bundle.Entry.Select(q => (Questionnaire)q.Resource));
-                bundle = await _fhirClient.ContinueAsync(bundle);
-            }
-
-            return results;
-        }
-
-        public async Task<Questionnaire> GetQuestionnaireByIdAsync(string id)
-        {
-            var result = await _fhirClient.ReadAsync<Questionnaire>($"Questionnaire/{id}");
-            if (result == null)
-                throw new System.Exception($"{id} was not found.");
-
-            return result;
-        }
-
-        public async Task<Questionnaire> CreateQuestionnaireAsync(Questionnaire questionnaire)
-        {
-            return await _fhirClient.CreateAsync<Questionnaire>(questionnaire);
-        }
-
-        public async Task<QuestionnaireResponse> SaveQuestionnaireResponseAsync(QuestionnaireResponse qResponse)
-        {
-            return await _fhirClient.CreateAsync<QuestionnaireResponse>(qResponse);
-        }
-
-        public async Task<QuestionnaireResponse> GetQuestionnaireResponseByIdAsync(string id)
-        {
-            var result = await _fhirClient.ReadAsync<QuestionnaireResponse>($"QuestionnaireResponse/{id}");
-            if (result == null)
-                throw new System.Exception($"{id} was not found.");
-
-            return result;
-        }
-
-        public async Task<IList<QuestionnaireResponse>> GetQuestionnaireResponsesByQuestionnaireIdAsync(string questionnaireId)
-        {
-            var bundle = await _fhirClient.SearchAsync<QuestionnaireResponse>(pageSize: 100);
-            var result = new List<QuestionnaireResponse>();
-            while (bundle != null)
-            {
-                result.AddRange(bundle.Entry.Select(qr => (QuestionnaireResponse)qr.Resource).ToList());
-                bundle = await _fhirClient.ContinueAsync(bundle);
-            }
-
-            return result.Where(r => r.Questionnaire.Contains(questionnaireId)).ToList();
-        }
-
-        public async Task<Questionnaire> UpdateQuestionnaireAsync(Questionnaire questionnaire)
-        {
-            return await _fhirClient.UpdateAsync<Questionnaire>(questionnaire);
-        }
-
-        #endregion
+        #endregion        
 
         #region Practitioners
         public async Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Hl7.Fhir.Model.Resource, new()

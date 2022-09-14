@@ -1,4 +1,5 @@
 ﻿using FhirBlaze.PatientModule.Models;
+using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -24,37 +25,66 @@ namespace FhirBlaze.PatientModule
         [Parameter]
         public IList<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected bool Loading { get; set; } = true;
-
+        protected PatientFilters Filters { get; set; } = new PatientFilters();
 
         protected override async Task OnInitializedAsync()
         {
-            var dateStr = string.Empty;
+            try
+            {
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.StartDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    Filters.StartDate = date;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
 
             try
             {
-                dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", "FilterDate");
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.EndDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    Filters.EndDate = date;
             }
-            catch (InvalidOperationException)
-            {
-                // do nothing
-            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
 
-            var date = !string.IsNullOrEmpty(dateStr) ? DateTime.Parse(dateStr) : DateTime.UtcNow.AddDays(-7);
+            try
+            {
+                Filters.FirstName = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.FirstName));
+                Filters.FirstName = Filters.FirstName == "null" ? null : Filters.FirstName;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+
+            try
+            {
+                Filters.LastName = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.LastName));
+                Filters.LastName = Filters.LastName == "null" ? null : Filters.LastName;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+
+            try
+            {
+                Filters.FhirId = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.FhirId));
+                Filters.FhirId = Filters.FhirId == "null" ? null : Filters.FhirId;
+            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
 
             // some issues with awaiting a task
-            await FetchData(date);
+            await FetchData();
 
             ShouldRender();
         }
 
         // todo: move count logic server side
-        protected async Task FetchData(DateTime filterDate)
+        protected async Task FetchData()
         {
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(filterDate);
-            var dvPatients = await DataverseService.GetPatients(filterDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(Filters);
+            var dvPatients = await DataverseService.GetPatientsAsync(Filters);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 

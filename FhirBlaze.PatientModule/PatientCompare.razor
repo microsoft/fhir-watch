@@ -1,6 +1,42 @@
 ﻿@page "/patients"
+@using FhirBlaze.SharedComponents
+@using FhirBlaze.PatientModule.Components
+
+<a style="back-button" onclick="history.go(-1)" href="#">Back </a>
+<br />
+<br />
+<div class="badge-list">
+     <span style="badge-list-first"> Live Filters: </span>
+    @if (@Filters.StartDate != DateTime.MinValue)
+    {
+        <span style="badge-list-middle">Start Date | </span>
+    }
+    @if (@Filters.EndDate != DateTime.MinValue)
+    {
+        <span style="badge-list-middle">End Date | </span>
+    }
+    @if (Filters.FhirId != null)
+    {
+        <span style="badge-list-middle">ID | </span>
+    }
+    @if (Filters.FirstName != null)
+    {
+        <span style="badge-list-middle">First Name | </span>
+    }
+    @if (Filters.LastName != null)
+    {
+        <span style="badge-list-middle">Last Name | </span>
+    }
+</div>
+<br />
 <h3>Compare Patients</h3>
 
+@if (Loading)
+{
+    <LoadingSpinner />
+}
+else
+{
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover">
         <thead class="thead-dark">
@@ -82,3 +118,4 @@
         </tbody>
     </table>
 </div>
+}

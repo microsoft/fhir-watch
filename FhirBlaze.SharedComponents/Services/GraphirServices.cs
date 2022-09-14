@@ -22,7 +22,7 @@ namespace FhirBlaze.SharedComponents.Services
 
        
 
-        public Task<Patient> CreatePatientsAsync(Patient patient)
+        public Task<Patient> CreatePatientAsync(Patient patient)
         {
             throw new NotImplementedException();
         }
@@ -179,10 +179,14 @@ namespace FhirBlaze.SharedComponents.Services
             return response.Data.WhoAmI ;
         }
 
-        Task<IList<Patient>> IFhirService.GetPatientsAsync(System.DateTime lastModified)
+        Task<IList<Patient>> IFhirService.GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IList<Patient>> IFhirService.GetPatientsAsync(PatientFilters patientFilters)
         {
             throw new NotImplementedException();
         }
     }
-
 }

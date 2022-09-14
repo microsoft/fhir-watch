@@ -1,4 +1,5 @@
 ﻿using FhirBlaze.PatientModule.Models;
+using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 namespace FhirBlaze.PatientModule
 {
     [Authorize]
@@ -24,11 +26,7 @@ namespace FhirBlaze.PatientModule
         IJSRuntime JsRuntime { get; set; }
         protected bool Loading { get; set; } = true;
 
-        // todo: make form model class?
-        protected string FilterId { get; set; } = null;
-        protected DateTime FilterDate { get; set; } = DateTime.UtcNow.AddDays(-7);
-        protected string FilterFirstName { get; set; } = null;
-        protected string FilterLastName { get; set; } = null;
+        protected PatientFilters Filters { get; set; } = new PatientFilters();
 
         public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected int FhirOrphanCount { get; set; }
@@ -37,24 +35,23 @@ namespace FhirBlaze.PatientModule
 
         protected override async Task OnInitializedAsync()
         {
-            // Try to fetch previously selected filterDate
-            var dateStr = string.Empty;
-
-
-            // todo: pull in other filter states from local storage
             try
             {
-                dateStr = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(FilterDate));
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.StartDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    Filters.StartDate = date;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
+            
+            try
             {
-                // do nothing
+                var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.EndDate));
+                if (DateTime.TryParse(str, out DateTime date))
+                    Filters.EndDate = date;
             }
-
-            if (!string.IsNullOrEmpty(dateStr))
-            {
-                FilterDate = DateTime.Parse(dateStr);
-            }
+            catch (InvalidOperationException) { /* do nothing */ }
+            catch (JSException) { /* do nothing */ }
 
             await FetchData();
 
@@ -67,8 +64,8 @@ namespace FhirBlaze.PatientModule
             Loading = true;
             Patients.Clear();
 
-            var fhirPatients = await FhirService.GetPatientsAsync(FilterDate);
-            var dvPatients = await DataverseService.GetPatients(FilterDate);
+            var fhirPatients = await FhirService.GetPatientsAsync(Filters);
+            var dvPatients = await DataverseService.GetPatientsAsync(Filters);
             var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
             var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
 
@@ -96,9 +93,9 @@ namespace FhirBlaze.PatientModule
         private async Task Search()
         {
             // save filters to local storage
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterId), FilterId);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterFirstName), FilterFirstName);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(FilterLastName), FilterLastName);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FhirId), Filters.FhirId);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FirstName), Filters.FirstName);
+            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.LastName), Filters.LastName);
 
             // navigate to compare page
             NavigationManager.NavigateTo("patients");
@@ -106,18 +103,32 @@ namespace FhirBlaze.PatientModule
 
         private void ClearFilters()
         {
-            FilterId = null;
-            FilterFirstName = null;
-            FilterLastName = null;
+            Filters = new PatientFilters();
         }
 
-        private async Task FilterDateChanged(DateTime newDateTime)
+        private async Task StartFilterDateChanged(DateTime newDateTime)
         {
-            FilterDate = newDateTime;
+            Filters.StartDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(FilterDate), FilterDate.ToShortDateString());
+                "stateManager.save", nameof(Filters.StartDate), Filters.StartDate.ToShortDateString());
+        }
+
+        private async Task EndFilterDateChanged(DateTime newDateTime)
+        {
+            Filters.EndDate = newDateTime;
+
+            // persist selection to localstorage
+            await JsRuntime.InvokeAsync<object>(
+                "stateManager.save", nameof(Filters.EndDate), Filters.EndDate.ToShortDateString());
+        }
+
+        private bool DisableDates()
+        {
+            return !string.IsNullOrWhiteSpace(Filters.FirstName)
+                || !string.IsNullOrWhiteSpace(Filters.LastName)
+                || !string.IsNullOrWhiteSpace(Filters.FhirId);
         }
     }
 }

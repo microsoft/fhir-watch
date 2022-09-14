@@ -3,6 +3,8 @@
 @using FhirBlaze.SharedComponents
 @using Hl7.Fhir.Model
 
+<a class="text-center" onclick="history.go(-1)" href="#">Back</a>
+<br />
 <h2>
     Patient Dashboard Sync
 </h2>
@@ -43,36 +45,37 @@ else
 
         <div class="form-group row">
             <form class="form">
-                <div class="form-group row">
-                    <label for="id" class="col-sm-8 col-form-label">FHIR ID:</label>
-                    <div class="col-sm-8">
-                        <input name="id" typeof="text" @bind="FilterId" />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="id" class="col-sm-8 col-form-label">FHIR ID:</label>
+                            <div class="col-sm-8">
+                                <input name="id" typeof="text" @bind="Filters.FhirId" />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="firstName" class="col-sm-8 col-form-label">First Name:</label>
+                            <div class="col-sm-8">
+                                <input name="firstName" typeof="text" @bind="Filters.FirstName" />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="lastName" class="col-sm-8 col-form-label">Last Name:</label>
+                            <div class="col-sm-8">
+                                <input name="lastName" typeof="text" @bind="Filters.LastName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <DateChooser Label="Last modified on or after" Value="Filters.StartDate" ValueChanged="@(e => StartFilterDateChanged(e))" Disabled="@DisableDates()" />
+                        <DateChooser Label="Last modified on or before" Value="Filters.EndDate" ValueChanged="@(e => EndFilterDateChanged(e))" Disabled="@DisableDates()" />
                     </div>
                 </div>
-
                 <div class="form-group row">
-                    <label for="firstName" class="col-sm-8 col-form-label">First Name:</label>
-                    <div class="col-sm-8">
-                        <input name="firstName" typeof="text" @bind="FilterFirstName" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label for="lastName" class="col-sm-8 col-form-label">Last Name:</label>
-                    <div class="col-sm-8">
-                        <input name="lastName" typeof="text" @bind="FilterLastName" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-8">
-                        <DateChooser Value="FilterDate" ValueChanged="@(e => FilterDateChanged(e))" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <button type="submit" @onclick="Search" class="btn btn-primary">Search</button>
-                    <div class="col-sm-6">
+                    <div class="col-12">
+                        <button type="submit" @onclick="Search" class="btn btn-primary">Search</button>
                         <button type="reset" @onclick="ClearFilters" class="btn btn-secondary">Clear</button>
                     </div>
                 </div>

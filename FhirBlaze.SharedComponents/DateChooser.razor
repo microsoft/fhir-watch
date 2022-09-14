@@ -1,10 +1,21 @@
-﻿<span>
-    <label>Date: </label>
-    <input type="date" value="@ValueStr" @onchange="@(e => OnValueChanged(e.Value))"/>
-</span>
+﻿<div class="form-group row">
+    <label for="@Name" class="col-sm-8 col-form-label">@Label:</label>
+    <div class="col-sm-8">
+        <input name="@Name" disabled="@Disabled" type="date" value="@ValueStr" @onchange="@(e => OnValueChanged(e.Value))" />
+    </div>
+</div>
 
 @code {
     private string ValueStr => Value.ToString("yyyy-MM-dd");
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public string Label { get; set; }
 
     [Parameter]
     public DateTime Value { get; set; } = DateTime.UtcNow;
