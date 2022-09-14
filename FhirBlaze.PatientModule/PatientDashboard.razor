@@ -19,26 +19,18 @@ else
         <div class="row">
             <div class="card text-center">
                 <div class="card-header bg-dark text-white ">
-                    <label>All Records</label> @*todo: make links to specialized searches*@
+                    <label>FHIR Records</label> @*todo: make links to specialized searches*@
                 </div>
                 <div class="card-body">
-                    <a href="#" class="btn btn-primary">@TotalRecordCount</a>
+                    <a href="#" class="btn btn-primary">@FhirCount</a>
                 </div>
-            </div>&nbsp;
+            </div>
             <div class="card text-center">
                 <div class="card-header bg-dark text-white ">
-                    <label>Orphan FHIR Records</label>
+                    <label>Dataverse Records</label>
                 </div>
                 <div class="card-body">
-                    <a href="#" class="btn btn-primary">@FhirOrphanCount</a>
-                </div>
-            </div>&nbsp;
-            <div class="card text-center">
-                <div class="card-header bg-dark text-white ">
-                    <label>Orphan Dataverse Records</label>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="btn btn-primary">@DataverseOrphanCount</a>
+                    <a href="#" class="btn btn-primary">@DVCount</a>
                 </div>
             </div>
         </div>

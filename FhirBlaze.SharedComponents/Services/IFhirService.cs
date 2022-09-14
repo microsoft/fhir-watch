@@ -14,8 +14,9 @@ namespace FhirBlaze.SharedComponents.Services
         /// <param name="resourceId"></param>
         /// <returns></returns>
         Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Resource, new();
+        Task<int> GetResourceCountAsync<TResource>() where TResource : Resource, new();
 
-        #region Patient
+            #region Patient
         /// <summary>
         /// Create a new <see cref="Patient"/>.
         /// </summary>
@@ -48,11 +49,6 @@ namespace FhirBlaze.SharedComponents.Services
         /// <returns></returns>
         Task<Patient> UpdatePatientAsync(string patientId, Patient patient);
         /// <summary>
-        /// Return a count of all patient records.
-        /// </summary>
-        /// <returns></returns>
-        Task<int> GetPatientCountAsync();
-        /// <summary>
         /// Return a list of patients using search criteria matching specified <see cref="Patient"/> properties.
         /// </summary>
         /// <param name="patient"><see cref="Patient"/></param>
@@ -62,9 +58,7 @@ namespace FhirBlaze.SharedComponents.Services
 
         #region Practitioners
         Task<IList<Practitioner>> GetPractitionersAsync();
-
-        Task<int> GetPractitionerCountAsync();
-
+        
         Task<IList<Practitioner>> SearchPractitioner(IDictionary<string, string> searchParameters);
 
         Task<Practitioner> CreatePractitionersAsync(Practitioner practitioner);
