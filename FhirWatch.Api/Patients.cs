@@ -95,7 +95,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "msemr_azurefhirid",
                         Operator = ConditionOperator.Equal,
-                        Values = { startLastModifiedDT }
+                        Values = { fhirId }
                     });
                 }
 
@@ -105,7 +105,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "firstname",
                         Operator = ConditionOperator.Like,
-                        Values = { startLastModifiedDT }
+                        Values = { firstName }
                     });
                 }
 
@@ -115,7 +115,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "lastname",
                         Operator = ConditionOperator.Like,
-                        Values = { startLastModifiedDT }
+                        Values = { lastName }
                     });
                 }
 
