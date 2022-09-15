@@ -4,29 +4,8 @@
 
 <button @onclick="NavigateToPatientDashboard" class="btn btn-primary">Back</button>
 <br />
-<div class="badge-list">
-    <span style="badge-list-first"> Live Filters: </span>
-    @if (@Filters.StartDate != DateTime.MinValue)
-    {
-        <span style="badge-list-middle">Start Date | </span>
-    }
-    @if (@Filters.EndDate != DateTime.MinValue)
-    {
-        <span style="badge-list-middle">End Date | </span>
-    }
-    @if (Filters.FhirId != null)
-    {
-        <span style="badge-list-middle">ID | </span>
-    }
-    @if (Filters.FirstName != null)
-    {
-        <span style="badge-list-middle">First Name | </span>
-    }
-    @if (Filters.LastName != null)
-    {
-        <span style="badge-list-middle">Last Name | </span>
-    }
-</div>
+Active Filters:
+<ActiveFilters Filters="@Filters"/>
 <br />
 <div class="container">
     <div class="row">
