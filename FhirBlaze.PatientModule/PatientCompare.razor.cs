@@ -26,6 +26,8 @@ namespace FhirBlaze.PatientModule
         public IList<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected bool Loading { get; set; } = true;
         protected PatientFilters Filters { get; set; } = new PatientFilters();
+        protected int FhirCount { get; set; }
+        protected int DVCount { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -102,12 +104,20 @@ namespace FhirBlaze.PatientModule
                 }
             }
 
+            FhirCount = fhirList.Count;
+            DVCount = dvList.Count;
+
             Loading = false;
         }
 
         private void NavigateToPatientDetail(EventArgs e, string id)
         {
             NavigationManager.NavigateTo($"patient/{id}");
+        }
+
+        private void NavigateToPatientDashboard(EventArgs e)
+        {
+            NavigationManager.NavigateTo("patient-dashboard");
         }
     }
 }

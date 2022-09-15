@@ -32,6 +32,21 @@ namespace FhirBlaze.SharedComponents.Services
         }
 
         /// <summary>
+        /// Get count of all Patients.
+        /// </summary>
+        /// <returns>int</returns>
+        public async Task<int> GetPatientCount()
+        {
+            var jsonResult = await http.GetStringAsync("patientcount");
+
+            if (string.IsNullOrWhiteSpace(jsonResult))
+                return 0;
+
+            var result = JObject.Parse(jsonResult);
+            return result.Value<int>("count");
+        }
+
+        /// <summary>
         /// Get a list of all Patients.
         /// </summary>
         /// <returns></returns>

@@ -17,6 +17,23 @@ namespace FhirBlaze.SharedComponents.Services
         {
             _fhirClient = client;
         }
+        #region GenericResource
+        public async Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Hl7.Fhir.Model.Resource, new()
+        {
+            var result = await _fhirClient.SearchByIdAsync<TResource>(resourceId, pageSize: _defaultPageSize);
+
+            TResource r = result.Entry.Select(e => (TResource)e.Resource).First();
+
+            return r;
+        }
+
+        public async Task<int> GetResourceCountAsync<TResource>() where TResource : Hl7.Fhir.Model.Resource, new()
+        {
+            var bundle = await _fhirClient.SearchAsync<TResource>(summary: SummaryType.Count);
+            return bundle.Total ?? 0;
+        }
+
+        #endregion
 
         #region Patient
         public async Task<IList<Patient>> GetPatientsAsync()
@@ -117,16 +134,7 @@ namespace FhirBlaze.SharedComponents.Services
         }
         #endregion        
 
-        #region Practitioners
-        public async Task<TResource> GetResourceByIdAsync<TResource>(string resourceId) where TResource : Hl7.Fhir.Model.Resource, new()
-        {
-            var result = await _fhirClient.SearchByIdAsync<TResource>(resourceId, pageSize: _defaultPageSize);
-
-            TResource r = result.Entry.Select(e => (TResource)e.Resource).First();
-
-            return r;
-        }
-
+        #region Practitioners        
         public async Task<IList<Practitioner>> GetPractitionersAsync()
         {
             var bundle = await _fhirClient.SearchAsync<Practitioner>(pageSize: 50);
@@ -140,11 +148,7 @@ namespace FhirBlaze.SharedComponents.Services
             return result;
         }
 
-        public async Task<int> GetPractitionerCountAsync()
-        {
-            var bundle = await _fhirClient.SearchAsync<Practitioner>(summary: SummaryType.Count);
-            return bundle.Total ?? 0;
-        }
+        
 
         public async Task<IList<Practitioner>> SearchPractitioner(IDictionary<string, string> searchParameters)
         {

@@ -35,12 +35,7 @@ namespace FhirBlaze.SharedComponents.Services
         public Task<Questionnaire> CreateQuestionnaireAsync(Questionnaire questionnaire)
         {
             throw new NotImplementedException();
-        }
-
-        public Task<int> GetPatientCountAsync()
-        {
-            throw new NotImplementedException();
-        }
+        }        
 
         public async Task<IList<Patient>> GetPatientsAsync()
         {
@@ -67,11 +62,6 @@ namespace FhirBlaze.SharedComponents.Services
             } 
             return result;
                 
-        }
-
-        public Task<int> GetPractitionerCountAsync()
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<IList<Practitioner>> GetPractitionersAsync()
@@ -185,6 +175,11 @@ namespace FhirBlaze.SharedComponents.Services
         }
 
         Task<IList<Patient>> IFhirService.GetPatientsAsync(PatientFilters patientFilters)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<int> IFhirService.GetResourceCountAsync<TResource>()
         {
             throw new NotImplementedException();
         }

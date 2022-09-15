@@ -95,7 +95,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "msemr_azurefhirid",
                         Operator = ConditionOperator.Equal,
-                        Values = { startLastModifiedDT }
+                        Values = { fhirId }
                     });
                 }
 
@@ -105,7 +105,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "firstname",
                         Operator = ConditionOperator.Like,
-                        Values = { startLastModifiedDT }
+                        Values = { firstName }
                     });
                 }
 
@@ -115,7 +115,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "lastname",
                         Operator = ConditionOperator.Like,
-                        Values = { startLastModifiedDT }
+                        Values = { lastName }
                     });
                 }
 
@@ -146,8 +146,46 @@ namespace FhirWatch.Api
             }
             catch (Exception ex)
             {
-                throw ex;
+                log.LogError(ex.Message);
+                throw new Exception("Error in GetPatients", ex);
             }
+        }
+
+        [FunctionName("PatientCount")]
+        public async Task<IActionResult> GetPatientCountAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "patientcount")] HttpRequest req,
+            ILogger log)
+        {
+            QueryExpression query = new QueryExpression
+            {
+                EntityName = "contact",
+                ColumnSet = new ColumnSet(new[] { "msemr_azurefhirid" }),
+                Criteria = new FilterExpression
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Conditions =
+                    {
+                        new ConditionExpression
+                        {
+                            AttributeName = "msemr_contacttype",
+                            Operator = ConditionOperator.Equal,
+                            Values = { 935000000 } 
+                            /*
+                             * Patient - 935000000
+                             * Practitioner - 935000001
+                             * Related Person - 935000002
+                             */
+                        }
+                    }
+                }
+            };
+
+            var resp = await _client.RetrieveMultipleAsync(query);
+
+            return new OkObjectResult(new
+            {
+                resp.Entities.Count
+            });
         }
 
         [FunctionName("PatientById")]
