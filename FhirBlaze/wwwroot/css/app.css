@@ -30,6 +30,34 @@ a, .btn-link {
     color: red;
 }
 
+
+.table th:nth-child(-n+2) {
+    position: sticky;
+    left: 0;
+}
+
+.table td:nth-child(-n+2) {
+    position: sticky;
+    left: 0;
+    background-color: #B9B7BD;
+    color: #373737;
+}
+
+.table-responsive {
+    height: 500px;
+    width: 95%;
+}
+
+.table-fixed tbody {
+    overflow-y: scroll;
+}
+
+.table-fixed thead {
+    position: sticky;
+    top: 0;
+}
+
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
