@@ -26,13 +26,13 @@
         @if (@Filters.StartDate != DateTime.MinValue)
         {
             <li class="list-group-item">
-                <span class="badge bg-primary text-white">Start Date</span> @Filters.StartDate.ToShortDateString()
+                <span class="badge bg-primary text-white">Start Date</span> @Filters.StartDate?.ToShortDateString()
             </li>
         }
         @if (@Filters.EndDate != DateTime.MinValue)
         {
             <li class="list-group-item">
-                <span class="badge bg-primary text-white">End Date</span> @Filters.EndDate.ToShortDateString()
+                <span class="badge bg-primary text-white">End Date</span> @Filters.EndDate?.ToShortDateString()
             </li>
         }
 

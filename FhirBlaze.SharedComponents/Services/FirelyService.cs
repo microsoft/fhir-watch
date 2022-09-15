@@ -69,7 +69,8 @@ namespace FhirBlaze.SharedComponents.Services
             if(!string.IsNullOrEmpty(patientFilters.FirstName)) // todo: fix
                 qryStringFilters.Add($"given:contains={patientFilters.FirstName}");
 
-            if (!qryStringFilters.Any())
+            // todo: fix form validation
+            if (!qryStringFilters.Any() && patientFilters.StartDate != null && patientFilters.StartDate != null)
                 qryStringFilters.AddRange(new[] {
                 $"_lastUpdated=gt{patientFilters.StartDate:yyyy-MM-dd}",
                 $"_lastUpdated=lt{patientFilters.EndDate:yyyy-MM-dd}" });
@@ -94,7 +95,7 @@ namespace FhirBlaze.SharedComponents.Services
         
         public async Task<IList<Patient>> SearchPatient(Patient Patient)
         {
-            string givenName = ""; //The given name is not working on the mapping
+            // The given name is not working on the mapping
             string familyName = Patient.Name[0].Family;
             string identifier = Patient.Identifier[0].Value;
             Bundle bundle;

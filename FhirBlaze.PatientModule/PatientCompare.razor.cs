@@ -51,6 +51,7 @@ namespace FhirBlaze.PatientModule
 
             try
             {
+                // todo: instead of saving nulls to local storage, remove entry
                 Filters.FirstName = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.FirstName));
                 Filters.FirstName = Filters.FirstName == "null" ? null : Filters.FirstName;
             }

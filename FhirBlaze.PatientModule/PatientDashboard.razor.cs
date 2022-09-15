@@ -38,7 +38,7 @@ namespace FhirBlaze.PatientModule
             }
             catch (InvalidOperationException) { /* do nothing */ }
             catch (JSException) { /* do nothing */ }
-            
+
             try
             {
                 var str = await JsRuntime.InvokeAsync<string>("stateManager.load", nameof(Filters.EndDate));
@@ -57,7 +57,7 @@ namespace FhirBlaze.PatientModule
         protected async Task FetchData()
         {
             Loading = true;
-            
+
             FhirCount = await FhirService.GetResourceCountAsync<Hl7.Fhir.Model.Patient>();
             DVCount = await DataverseService.GetPatientCount();
 
@@ -67,35 +67,52 @@ namespace FhirBlaze.PatientModule
         private async Task Search()
         {
             // save filters to local storage
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FhirId), Filters.FhirId);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.FirstName), Filters.FirstName);
-            await JsRuntime.InvokeAsync<object>("stateManager.save", nameof(Filters.LastName), Filters.LastName);
+            await SaveAsync(nameof(Filters.FhirId), Filters.FhirId);
+            await SaveAsync(nameof(Filters.FirstName), Filters.FirstName);
+            await SaveAsync(nameof(Filters.LastName), Filters.LastName);
+            await SaveAsync(nameof(Filters.StartDate), Filters.StartDate);
+            await SaveAsync(nameof(Filters.EndDate), Filters.EndDate);
 
             // navigate to compare page
             NavigationManager.NavigateTo("patients");
         }
 
-        private void ClearFilters()
+        private async Task SaveAsync(string propertyName, object value)
         {
-            Filters = new PatientFilters();
+            try
+            {
+                await (value != null ?
+                JsRuntime.InvokeVoidAsync("stateManager.save", propertyName, value) :
+                JsRuntime.InvokeVoidAsync("localStorage.removeItem", propertyName));
+            } catch (Exception exception)
+            {
+                throw exception;
+            }
         }
 
-        private async Task StartFilterDateChanged(DateTime newDateTime)
+        private async void ClearFilters()
+        {
+            Filters = new PatientFilters();
+
+            await JsRuntime.InvokeVoidAsync("localStorage.clear");
+        }
+
+        private async Task StartFilterDateChanged(DateTime? newDateTime)
         {
             Filters.StartDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(Filters.StartDate), Filters.StartDate.ToShortDateString());
+                "stateManager.save", nameof(Filters.StartDate), Filters.StartDate?.ToShortDateString());
         }
 
-        private async Task EndFilterDateChanged(DateTime newDateTime)
+        private async Task EndFilterDateChanged(DateTime? newDateTime)
         {
             Filters.EndDate = newDateTime;
 
             // persist selection to localstorage
             await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", nameof(Filters.EndDate), Filters.EndDate.ToShortDateString());
+                "stateManager.save", nameof(Filters.EndDate), Filters.EndDate?.ToShortDateString());
         }
 
         private bool DisableDates()
