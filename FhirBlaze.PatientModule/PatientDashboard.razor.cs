@@ -1,13 +1,10 @@
-﻿using FhirBlaze.PatientModule.Models;
-using FhirBlaze.SharedComponents;
+﻿using FhirBlaze.SharedComponents;
 using FhirBlaze.SharedComponents.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FhirBlaze.PatientModule
@@ -28,12 +25,8 @@ namespace FhirBlaze.PatientModule
 
         protected PatientFilters Filters { get; set; } = new PatientFilters();
 
-        public List<PatientCompareModel> Patients { get; set; } = new List<PatientCompareModel>();
         protected int FhirCount { get; set; }
         protected int DVCount { get; set; }
-        //protected int FhirOrphanCount { get; set; }
-        //protected int DataverseOrphanCount { get; set; }
-        //protected int TotalRecordCount { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -64,30 +57,7 @@ namespace FhirBlaze.PatientModule
         protected async Task FetchData()
         {
             Loading = true;
-            Patients.Clear();
-
-            //var fhirPatients = await FhirService.GetPatientsAsync(Filters);
-            //var dvPatients = await DataverseService.GetPatientsAsync(Filters);
-            //var fhirList = fhirPatients.Select(f => new PatientViewModel(f)).ToList();
-            //var dvList = dvPatients.Select(d => new PatientViewModel(d)).ToList();
-
-            //foreach (var fhirPatient in fhirList)
-            //{
-            //    var matchingDvPatient = dvList.FirstOrDefault(d => d.Id == fhirPatient.Id);
-            //    Patients.Add(new PatientCompareModel(fhirPatient.Id, fhirPatient, matchingDvPatient));
-            //}
-
-            //foreach (var dvPatient in dvList)
-            //{
-            //    if (dvPatient.Id == null || !Patients.Any(p => p.Id == dvPatient.Id))
-            //    {
-            //        Patients.Add(new PatientCompareModel(dvPatient.Id, null, dvPatient));
-            //    }
-            //}
-
-            //FhirOrphanCount = Patients.Count(p => p.Item1 != null && p.Item2 == null);
-            //DataverseOrphanCount = Patients.Count(p => p.Item2 != null && p.Item1 == null);
-            //TotalRecordCount = Patients.Count();
+            
             FhirCount = await FhirService.GetResourceCountAsync<Hl7.Fhir.Model.Patient>();
             DVCount = await DataverseService.GetPatientCount();
 
