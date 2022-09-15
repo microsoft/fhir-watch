@@ -1,35 +1,42 @@
 ﻿@using FhirBlaze.SharedComponents
 <ul class="list-group list-group-horizontal">
-    @if (@Filters.StartDate != DateTime.MinValue)
+    @if (@Filters.IsSearchable)
     {
-        <li class="list-group-item">
-            <span class="badge bg-primary text-white">Start Date</span> @Filters.StartDate?.ToShortDateString()
-        </li>
+        @if (Filters.FhirId != null)
+        {
+            <li class="list-group-item">
+                <span class="badge bg-primary text-white">FHIR ID</span> @Filters.FhirId
+            </li>
+        }
+        @if (Filters.FirstName != null)
+        {
+            <li class="list-group-item">
+                <span class="badge bg-primary text-white">First Name</span> @Filters.FirstName
+            </li>
+        }
+        @if (Filters.LastName != null)
+        {
+            <li class="list-group-item">
+                <span class="badge bg-primary text-white">Last Name</span> @Filters.LastName
+            </li>
+        }
     }
-    @if (@Filters.EndDate != DateTime.MinValue)
+    else
     {
-        <li class="list-group-item">
-            <span class="badge bg-primary text-white">End Date</span> @Filters.EndDate?.ToShortDateString()
-        </li>
-    }
-    @if (Filters.FhirId != null)
-    {
-        <li class="list-group-item">
-            <span class="badge bg-primary text-white">FHIR ID</span> @Filters.FhirId
-        </li>
-    }
-    @if (Filters.FirstName != null)
-    {
-        <li class="list-group-item">
-            <span class="badge bg-primary text-white">First Name</span> @Filters.FirstName
-        </li>
-    }
-    @if (Filters.LastName != null)
-    {
-        <li class="list-group-item">
-            <span class="badge bg-primary text-white">Last Name</span> @Filters.LastName
-        </li>
-    }
+        @if (@Filters.StartDate != DateTime.MinValue)
+        {
+            <li class="list-group-item">
+                <span class="badge bg-primary text-white">Start Date</span> @Filters.StartDate?.ToShortDateString()
+            </li>
+        }
+        @if (@Filters.EndDate != DateTime.MinValue)
+        {
+            <li class="list-group-item">
+                <span class="badge bg-primary text-white">End Date</span> @Filters.EndDate?.ToShortDateString()
+            </li>
+        }
+
+    }    
 </ul>
 
 @code {

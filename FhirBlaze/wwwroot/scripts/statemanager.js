@@ -4,5 +4,8 @@
     },
     load: function (key) {
         return localStorage[key];
+    },
+    delete: function (key) {
+        localStorage.removeItem(key);
     }
 };

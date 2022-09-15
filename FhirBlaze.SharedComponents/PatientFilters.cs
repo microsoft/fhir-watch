@@ -11,6 +11,6 @@ namespace FhirBlaze.SharedComponents
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public bool IsSearchable => !string.IsNullOrEmpty(FhirId) && !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName);
+        public bool IsSearchable => !string.IsNullOrEmpty(FhirId) || !string.IsNullOrEmpty(FirstName) || !string.IsNullOrEmpty(LastName);
     }
 }
