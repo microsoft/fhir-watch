@@ -20,6 +20,9 @@
     <PractitionerSearchComponent SearchClicked="SearchPractitioner" />
 }
 
-<CascadingValue Value="Practitioners">
-    <PractitionerListComponent OnPractitionerSelected="PractitionerSelected" />
-</CascadingValue>
+@if (!_loading)
+{
+    <CascadingValue Value="Practitioners">
+        <PractitionerListComponent OnPractitionerSelected="PractitionerSelected" />
+    </CascadingValue>
+}

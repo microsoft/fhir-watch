@@ -56,10 +56,10 @@ namespace FhirWatch.Api
         {
             try
             {
-                var startLastModifiedDT = string.IsNullOrEmpty(req.Query["startDate"]) ?
-                    DateTime.MinValue : DateTime.Parse(req.Query["startDate"]);
-                var endLastModifiedDT = string.IsNullOrEmpty(req.Query["endDate"]) ?
-                    DateTime.UtcNow : DateTime.Parse(req.Query["endDate"]);
+                DateTime? startLastModifiedDT = string.IsNullOrEmpty(req.Query["startDate"]) ?
+                    null : DateTime.Parse(req.Query["startDate"]);
+                DateTime? endLastModifiedDT = string.IsNullOrEmpty(req.Query["endDate"]) ?
+                    null : DateTime.Parse(req.Query["endDate"]);
 
                 var fhirId = req.Query["fhirId"].ToString();
                 var firstName = req.Query["firstName"].ToString();
@@ -119,7 +119,7 @@ namespace FhirWatch.Api
                     });
                 }
 
-                if (query?.Criteria?.Conditions?.Count <= 1 || startLastModifiedDT > DateTime.MinValue)
+                if (query?.Criteria?.Conditions?.Count <= 1 && startLastModifiedDT != null)
                 {
                     query.Criteria.AddCondition(new ConditionExpression
                     {
@@ -128,7 +128,7 @@ namespace FhirWatch.Api
                         Values = { startLastModifiedDT }
                     });
 
-                    if (endLastModifiedDT > DateTime.UtcNow)
+                    if (endLastModifiedDT != null)
                     {
                         query.Criteria.AddCondition(new ConditionExpression
                         {

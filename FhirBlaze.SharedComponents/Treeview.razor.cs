@@ -16,7 +16,8 @@ namespace FhirBlaze.SharedComponents
         [Parameter]
         public Branch Trunk { get; set; }
 
-        private void SpanToggle(EventArgs e, Branch item)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+        private static void SpanToggle(EventArgs e, Branch item)
         {
             item.Expanded = !item.Expanded;
         }
@@ -147,28 +148,21 @@ namespace FhirBlaze.SharedComponents
             }
         }
 
-        private bool IsDate(object obj)
+        private static bool IsDate(object obj)
         {
-            return DateTime.TryParse(obj as string, out var dateTime) || obj.GetType() == typeof(DateTimeOffset);
+            return DateTime.TryParse(obj as string, out _) || obj.GetType() == typeof(DateTimeOffset);
         }
 
-        private bool OverridesToString(object obj)
+        private static bool OverridesToString(object obj)
         {
-            try
-            {
-                MethodInfo methodInfo = obj.GetType().GetMethod("ToString", new[] { typeof(string) });
+            MethodInfo methodInfo = obj.GetType().GetMethod("ToString", new[] { typeof(string) });
 
-                if (methodInfo == null)
-                    return false;
+            if (methodInfo == null)
+                return false;
 
-                return methodInfo.DeclaringType != methodInfo.GetBaseDefinition().DeclaringType;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return methodInfo.DeclaringType != methodInfo.GetBaseDefinition().DeclaringType;
         }
-        private bool IsList(object obj)
+        private static bool IsList(object obj)
         {
             try
             {
@@ -180,7 +174,7 @@ namespace FhirBlaze.SharedComponents
             }
         }
 
-        private bool IsPrimitive(object obj)
+        private static bool IsPrimitive(object obj)
         {
             if (obj == null) // questionable..
                 return true;

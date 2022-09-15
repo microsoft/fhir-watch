@@ -78,38 +78,31 @@ namespace FhirBlaze.SharedComponents.Services
         /// <returns></returns>
         public async Task<JArray> GetPatientsAsync(PatientFilters filters)
         {
-            try
-            {
-                var queryStr = "patients";
+            var queryStr = "patients";
 
-                var qryStringFilters = new List<string>();
+            var qryStringFilters = new List<string>();
 
-                if (!string.IsNullOrEmpty(filters.FhirId)) // todo: fix
-                    qryStringFilters.Add($"fhirId={filters.FhirId}");
-                if (!string.IsNullOrEmpty(filters.LastName))
-                    qryStringFilters.Add($"lastName={filters.LastName}");
-                if (!string.IsNullOrEmpty(filters.FirstName)) // todo: fix
-                    qryStringFilters.Add($"firstName={filters.FirstName}");
+            if (!string.IsNullOrEmpty(filters.FhirId)) // todo: fix
+                qryStringFilters.Add($"fhirId={filters.FhirId}");
+            if (!string.IsNullOrEmpty(filters.LastName))
+                qryStringFilters.Add($"lastName={filters.LastName}");
+            if (!string.IsNullOrEmpty(filters.FirstName)) // todo: fix
+                qryStringFilters.Add($"firstName={filters.FirstName}");
 
-                if (!qryStringFilters.Any())
-                    qryStringFilters.AddRange(new[] {
+            if (!qryStringFilters.Any())
+                qryStringFilters.AddRange(new[] {
                 $"startDate={filters.StartDate:yyyy-MM-dd}",
                 $"endDate={filters.EndDate:yyyy-MM-dd}" });
 
-                if (qryStringFilters.Any())
-                    queryStr = queryStr + "?" + string.Join('&', qryStringFilters.ToArray());
+            if (qryStringFilters.Any())
+                queryStr = queryStr + "?" + string.Join('&', qryStringFilters.ToArray());
 
-                var results = await http.GetStringAsync(queryStr);
+            var results = await http.GetStringAsync(queryStr);
 
-                if (string.IsNullOrWhiteSpace(results))
-                    return null;
+            if (string.IsNullOrWhiteSpace(results))
+                return null;
 
-                return JArray.Parse(results);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return JArray.Parse(results);
         }
     }
 }

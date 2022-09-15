@@ -6,7 +6,7 @@
 </div>
 
 @code {
-    private string ValueStr => Value.ToString("yyyy-MM-dd");
+    private string ValueStr => Value?.ToString("yyyy-MM-dd");
 
     [Parameter]
     public string Name { get; set; }
@@ -18,12 +18,12 @@
     public string Label { get; set; }
 
     [Parameter]
-    public DateTime Value { get; set; } = DateTime.UtcNow;
+    public DateTime? Value { get; set; } = DateTime.UtcNow;
 
     [Parameter]
-    public EventCallback<DateTime> ValueChanged { get; set; }
+    public EventCallback<DateTime?> ValueChanged { get; set; }
 
-    protected async Task OnValueChanged(object? newDate)
+    protected async Task OnValueChanged(object newDate)
     {
         Value = DateTime.Parse((string)newDate);
         await ValueChanged.InvokeAsync(Value);

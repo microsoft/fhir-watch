@@ -56,9 +56,7 @@ namespace FhirBlaze.SharedComponents.Services
                 try
                 {
                     result.Add(_fhirParser.Parse<Patient>(p.RootElement.ToString()));
-                }catch (Exception e){
-
-                }
+                }catch (Exception){ /* do nothing */ }
             } 
             return result;
                 
@@ -88,10 +86,7 @@ namespace FhirBlaze.SharedComponents.Services
                 {
                     result.Add(_fhirParser.Parse<Practitioner>(p.RootElement.ToString()));
                 }
-                catch (Exception e)
-                {
-
-                }
+                catch (Exception) {/* do nothing */}
             }
             return result;
         }
