@@ -105,7 +105,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "firstname",
                         Operator = ConditionOperator.Like,
-                        Values = { firstName }
+                        Values = { $"%{firstName}%" }
                     });
                 }
 
@@ -115,7 +115,7 @@ namespace FhirWatch.Api
                     {
                         AttributeName = "lastname",
                         Operator = ConditionOperator.Like,
-                        Values = { lastName }
+                        Values = { $"%{lastName}%" }
                     });
                 }
 
