@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,6 +16,11 @@ namespace FhirBlaze.SharedComponents.Services
             this.http = http;
         }
 
+        /// <summary>
+        /// Get Patient by FHIR Id.
+        /// </summary>
+        /// <param name="fhirId"></param>
+        /// <returns></returns>
         public async Task<JObject> GetPatientByFhirIdAsync(string fhirId)
         {
             var result = await http.GetStringAsync($"patients/{fhirId}");
@@ -24,17 +31,26 @@ namespace FhirBlaze.SharedComponents.Services
             return JObject.Parse(result);
         }
 
-        public async Task<JObject> GetPatientByFhirIdAsync(string fhirId, DateTime lastModified)
+        /// <summary>
+        /// Get count of all Patients.
+        /// </summary>
+        /// <returns>int</returns>
+        public async Task<int> GetPatientCount()
         {
-            var result = await http.GetStringAsync($"patients/{fhirId}?lastModified={lastModified.ToShortDateString()}");
+            var jsonResult = await http.GetStringAsync("patientcount");
 
-            if (string.IsNullOrWhiteSpace(result))
-                return null;
+            if (string.IsNullOrWhiteSpace(jsonResult))
+                return 0;
 
-            return JObject.Parse(result);
+            var result = JObject.Parse(jsonResult);
+            return result.Value<int>("count");
         }
 
-        public async Task<JArray> GetPatients()
+        /// <summary>
+        /// Get a list of all Patients.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync()
         {
             var results = await http.GetStringAsync($"patients");
 
@@ -44,14 +60,56 @@ namespace FhirBlaze.SharedComponents.Services
             return JArray.Parse(results);
         }
 
-        public async Task<JArray> GetPatients(DateTime lastModified)
+        /// <summary>
+        /// Get a list of all Patients where lastModified date is between startLastModified and endLastModified.
+        /// </summary>
+        /// <param name="startLastModified"></param>
+        /// <param name="endLastModified"></param>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync(DateTime startLastModified, DateTime endLastModified)
         {
-            var results = await http.GetStringAsync($"patients?lastModified={lastModified.ToShortDateString()}");
+            return await GetPatientsAsync(new PatientFilters { StartDate = startLastModified, EndDate = endLastModified });
+        }
 
-            if (string.IsNullOrWhiteSpace(results))
-                return null;
+        /// <summary>
+        /// Get a list of all Patients matching <see cref="PatientFilters"/> criteria.
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public async Task<JArray> GetPatientsAsync(PatientFilters filters)
+        {
+            try
+            {
+                var queryStr = "patients";
 
-            return JArray.Parse(results);
+                var qryStringFilters = new List<string>();
+
+                if (!string.IsNullOrEmpty(filters.FhirId)) // todo: fix
+                    qryStringFilters.Add($"fhirId={filters.FhirId}");
+                if (!string.IsNullOrEmpty(filters.LastName))
+                    qryStringFilters.Add($"lastName={filters.LastName}");
+                if (!string.IsNullOrEmpty(filters.FirstName)) // todo: fix
+                    qryStringFilters.Add($"firstName={filters.FirstName}");
+
+                if (!qryStringFilters.Any())
+                    qryStringFilters.AddRange(new[] {
+                $"startDate={filters.StartDate:yyyy-MM-dd}",
+                $"endDate={filters.EndDate:yyyy-MM-dd}" });
+
+                if (qryStringFilters.Any())
+                    queryStr = queryStr + "?" + string.Join('&', qryStringFilters.ToArray());
+
+                var results = await http.GetStringAsync(queryStr);
+
+                if (string.IsNullOrWhiteSpace(results))
+                    return null;
+
+                return JArray.Parse(results);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

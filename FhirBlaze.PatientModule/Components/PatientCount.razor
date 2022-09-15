@@ -1,9 +1,16 @@
-﻿@if (Count > 0) 
-{
-<h3>Found: @Count records.</h3>
-}
+﻿<div class="card text-center">
+    <div class="card-header bg-dark text-white ">
+        <label>@Header</label>
+    </div>
+    <div class="card-body">
+        <h3><span class="badge bg-secondary text-white">@Count</span></h3>
+    </div>
+</div>
 
 @code {
     [Parameter]
-    public int Count { get; set; }
+    public int Count { get; set; } = 0;
+
+    [Parameter]
+    public string Header { get; set; } = "Count";
 }
