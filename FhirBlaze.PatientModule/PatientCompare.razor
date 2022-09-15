@@ -31,20 +31,10 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <div class="card text-center">
-                <div class="card-header bg-dark text-white ">FHIR Records</div>
-                <div class="card-body">
-                    <h3><span class="badge bg-secondary text-white">@FhirCount</span></h3>
-                </div>
-            </div>
+            <PatientCount Header="FHIR Records" Count="@FhirCount" />            
         </div>
         <div class="col">
-            <div class="card text-center">
-                <div class="card-header bg-dark text-white ">Dataverse Records</div>
-                <div class="card-body">
-                    <h3><span class="badge bg-secondary text-white">@DVCount</span></h3>
-                </div>
-            </div>
+            <PatientCount Header="Dataverse Records" Count="@DVCount" />
         </div>
     </div>
     <div class="row">

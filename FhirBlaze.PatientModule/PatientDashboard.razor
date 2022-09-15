@@ -16,22 +16,8 @@ else
 {
     <div class="container">
         <div class="row">
-            <div class="card text-center">
-                <div class="card-header bg-dark text-white ">
-                    <label>FHIR Records</label>
-                </div>
-                <div class="card-body">
-                    <h3><span class="badge bg-secondary text-white">@FhirCount</span></h3>
-                </div>
-            </div>
-            <div class="card text-center">
-                <div class="card-header bg-dark text-white ">
-                    <label>Dataverse Records</label>
-                </div>
-                <div class="card-body">
-                    <h3><span class="badge bg-secondary text-white">@DVCount</span></h3>
-                </div>
-            </div>
+            <PatientCount Header="FHIR Records" Count="@FhirCount"/>
+            <PatientCount Header="Dataverse Records" Count="@DVCount"/>            
         </div>
 
         <div class="form-group row">
