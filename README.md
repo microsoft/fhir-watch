@@ -13,7 +13,7 @@
 </tr>
 </table>
 
-<img src="./docs/img/fhir-watch.png" width=300 float=right><br/>
+<img src="./docs/img/fhir-watch.png" width=150 float=right><br/>
 
 # FHIRWatch
 Welcome to FHIRWatch!
