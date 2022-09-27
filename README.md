@@ -1,5 +1,3 @@
-<img src="./docs/img/fhir-watch.png" width=300 align=right><br/>
-
 <table>
 <tr>
 <th>Client App</th>
@@ -14,6 +12,8 @@
 </td>
 </tr>
 </table>
+
+<img src="./docs/img/fhir-watch.png" width=300 float=right><br/>
 
 # FHIRWatch
 Welcome to FHIRWatch!
