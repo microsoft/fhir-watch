@@ -1,0 +1,54 @@
+﻿@page "/patient/{Id}"
+@using FhirWatch.SharedComponents
+
+<nav class="navbar navbar-light bg-light">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <button @onclick="NavigateToPatientList" class="btn btn-primary">Back to Patient List</button>
+        </li>
+        <li class="nav-item">
+            <button @onclick="(e => Raw = !Raw)" class="btn btn-secondary">@(Raw ? "Show Tree View" : "Show Raw JSON")</button>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+    <br />
+    @if (!Loading)
+    {
+        @if (Raw)
+        {
+            <div class="row justify-content-start">
+                <div class="col-6 alert-dark justify-content-center">FHIR Data</div>
+                <div class="col-6 alert-dark justify-content-center">Dataverse Data</div>
+            </div>
+            <div class="row">
+                <div class="col-6 alert-primary">
+                    <RawJson Obj="@Patient" />
+                </div>
+                <div class="col-6 alert-success">
+                    <RawJson Obj="@PatientDV" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row justify-content-start">
+                <div class="col-6 alert-dark justify-content-center">FHIR Data</div>
+                <div class="col-6 alert-dark justify-content-center">Dataverse Data</div>
+            </div>
+            <div class="row">
+                <div class="col-6 alert-primary">
+                    <Treeview Trunk="Trunk1" />
+                </div>
+                <div class="col-6 alert-success">
+                    <Treeview Trunk="Trunk2" />
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <LoadingSpinner />
+    }
+</div>
