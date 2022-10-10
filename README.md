@@ -1,3 +1,20 @@
+<table>
+<tr>
+<th>Client App</th>
+<th>API</th>
+</tr>
+<tr>
+<td>
+    <a href="https://github.com/microsoft/fhir-watch/actions/workflows/azure-static-web-apps-calm-wave-01c2b9f10.yml"><img src="https://github.com/microsoft/fhir-watch/actions/workflows/azure-static-web-apps-calm-wave-01c2b9f10.yml/badge.svg" alt="Azure Static Web Apps CI/CD"></a>
+</td>
+<td>
+    <a href="https://github.com/microsoft/fhir-watch/actions/workflows/FhirWatchApi20220815130348.yml"><img src="https://github.com/microsoft/fhir-watch/actions/workflows/FhirWatchApi20220815130348.yml/badge.svg" alt="Build and deploy .NET Core application to Function App FhirWatchApi20220815130348"></a>
+</td>
+</tr>
+</table>
+
+![fhir-watch-banner](./docs/img/fhir-watch-banner.png)
+
 # FHIRWatch
 Welcome to FHIRWatch!
 
