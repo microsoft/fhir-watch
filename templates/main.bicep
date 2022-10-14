@@ -43,7 +43,6 @@ resource clientApp 'Microsoft.Web/staticSites@2022-03-01' = {
 
 resource linkedApi 'Microsoft.Web/staticSites/linkedBackends@2022-03-01' = {
   name: 'backend1'
-  kind: 
   parent: clientApp
   properties: {
     backendResourceId: apiApp.outputs.functionappid
