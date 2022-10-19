@@ -49,3 +49,8 @@ resource linkedApi 'Microsoft.Web/staticSites/linkedBackends@2022-03-01' = {
     region: location
   }
 }
+
+output swaProperties object = {
+  appName: clientApp.name
+  hostname: clientApp.properties.defaultHostname
+}
