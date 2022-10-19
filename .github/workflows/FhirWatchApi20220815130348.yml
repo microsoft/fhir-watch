@@ -74,13 +74,13 @@ jobs:
       #  with:
       #    app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}          
       #    package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-      #- name: Build And Deploy
-      #  id: builddeploy
-      #  uses: Azure/static-web-apps-deploy@v1
-      #  with:
-      #    azure_static_web_apps_api_token: ${{ steps.get-swa-key.outputs.APIKEY }}
-      #    #repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-      #    action: "upload"
-      #    app_location: "FhirWatch"
-      #    api_location: ""
-      #    output_location: "wwwroot"
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.get-swa-key.outputs.APIKEY }}
+          #repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          action: "upload"
+          app_location: "FhirWatch"
+          api_location: ""
+          output_location: "wwwroot"
