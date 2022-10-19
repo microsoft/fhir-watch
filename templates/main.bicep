@@ -42,17 +42,10 @@ resource clientApp 'Microsoft.Web/staticSites@2022-03-01' = {
 }
 
 resource linkedApi 'Microsoft.Web/staticSites/linkedBackends@2022-03-01' = {
-  name: '${clientappname}/backend1'
+  name: 'backend1'
+  parent: clientApp
   properties: {
     backendResourceId: apiApp.outputs.functionappid
     region: location
-  }
-}
-
-resource linkedFunctionApp 'Microsoft.Web/staticSites/userProvidedFunctionApps@2022-03-01' = {
-  name: '${clientappname}/backend1'
-  properties: {
-    functionAppResourceId: apiApp.outputs.functionappid
-    functionAppRegion: location
   }
 }
