@@ -67,8 +67,8 @@ jobs:
       - name: 'Run Azure CLI commands'
         id: get-swa-key
         run: |
-          appName=$(echo '${{ needs.provision.outputs.swaProperties }}' | jq '.appName')
-          key=$(az staticwebapp secrets list -n $appName --query "properties.apiKey" | xargs)
+          appName=$(echo '${{ needs.provision.outputs.swaProperties }}' | jq -r '.appName')
+          key=$(az staticwebapp secrets list -n $appName | jq -r 'properties.apiKey')
           echo $key
           echo 'APIKEY=$key' >> $GITHUB_OUTPUT
       #- name: Deploy to Azure Function App
