@@ -66,7 +66,7 @@ resource functionAppSite 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~2'
+          value: '~4'
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -100,4 +100,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-output functionappid string = functionAppSite.id
+output functionAppProps object = {
+  functionAppId: functionAppSite.id
+  functionAppName: functionAppSite.name
+}

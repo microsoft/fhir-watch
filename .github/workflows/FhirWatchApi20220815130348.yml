@@ -1,4 +1,4 @@
-name: Build and deploy Function App & Static Web App
+name: Build and Deploy Function App & Static Web App
 on:
   push:
     branches:
@@ -10,13 +10,13 @@ on:
 env:
   AZURE_SUBSCRIPTION_ID: '1c642d88-5042-4d19-9d49-49be6612a40f'
   AZURE_RESOURCE_GROUP: 'rg-fhirwatch'
-  AZURE_FUNCTIONAPP_NAME: FhirWatchApi20220815130348
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: FhirWatch.Api\published
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: FhirWatch.Api/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: FhirWatch.Api
 jobs:
   build:
+    name: Build API Function
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -29,13 +29,19 @@ jobs:
     - name: Build
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"    
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+    - name: Upload API artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: .net-app
+        path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
   provision:
     name: Provision Azure Resources
     runs-on: ubuntu-latest
     needs: build
     outputs:
       swaProperties: ${{ steps.deploy-bicep.outputs.swaProperties }}
+      functionAppName: ${{ steps.deploy-bicep.outputs.functionAppName }}
     steps:
     - name: Azure Login
       uses: azure/login@v1
@@ -51,10 +57,9 @@ jobs:
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./templates/main.bicep 
         parameters: 'dataverseClientSecret="${{ secrets.DATAVERSE_CLIENT_SECRET }}"'  
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Deploy API and Client App
     needs: provision
     steps:
       - uses: actions/checkout@v2
@@ -67,11 +72,17 @@ jobs:
       - name: 'Run Azure CLI commands'
         id: get-swa-key
         run: |
-          echo "APIKEY=$(az staticwebapp secrets list -n ${{ needs.provision.outputs.swaProperties.appName }} --query {properties.apiKey})" >> $GITHUB_OUTPUT
+          appName=$(echo '${{ needs.provision.outputs.swaProperties }}' | jq -r '.appName')
+          echo "APIKEY=$(az staticwebapp secrets list -n $appName | jq -r '.properties.apiKey')" >> $GITHUB_OUTPUT
+      - name: Download API artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: .net-app
+          path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
       - name: Deploy to Azure Function App
         uses: Azure/functions-action@v1
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}          
+          app-name: ${{ needs.provision.outputs.functionAppName }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
       - name: Build And Deploy
         id: builddeploy
