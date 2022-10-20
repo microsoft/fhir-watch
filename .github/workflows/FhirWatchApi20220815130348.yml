@@ -37,6 +37,7 @@ jobs:
     needs: build
     outputs:
       swaProperties: ${{ steps.deploy-bicep.outputs.swaProperties }}
+      functionProperties: ${{ steps.deploy-bicep.outputs.functionProperties }}
     steps:
     - name: Azure Login
       uses: azure/login@v1
@@ -69,11 +70,11 @@ jobs:
         run: |
           appName=$(echo '${{ needs.provision.outputs.swaProperties }}' | jq -r '.appName')
           echo "APIKEY=$(az staticwebapp secrets list -n $appName | jq -r '.properties.apiKey')" >> $GITHUB_OUTPUT
-      #- name: Deploy to Azure Function App
-      #  uses: Azure/functions-action@v1
-      #  with:
-      #    app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}          
-      #    package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}      
+      - name: Deploy to Azure Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ needs.provision.outputs.functionProperties.functionAppName }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

@@ -45,7 +45,7 @@ resource linkedApi 'Microsoft.Web/staticSites/linkedBackends@2022-03-01' = {
   name: 'backend1'
   parent: clientApp
   properties: {
-    backendResourceId: apiApp.outputs.functionappid
+    backendResourceId: apiApp.outputs.functionAppProps.functionAppId
     region: location
   }
 }
@@ -54,3 +54,4 @@ output swaProperties object = {
   appName: clientApp.name
   hostname: clientApp.properties.defaultHostname
 }
+output functionProperties object = apiApp.outputs.functionAppProps

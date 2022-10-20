@@ -100,4 +100,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-output functionappid string = functionAppSite.id
+output functionAppProps object = {
+  functionAppId: functionAppSite.id
+  functionAppName: functionAppSite.name
+}
