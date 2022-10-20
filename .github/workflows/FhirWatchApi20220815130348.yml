@@ -1,9 +1,8 @@
-name: Build and deploy Function App & Static Web App
+name: Build and Deploy Function App & Static Web App
 on:
   push:
     branches:
     - main
-    - phjirsa/bicep
     paths-ignore:
       - 'docs/**'
   workflow_dispatch:
@@ -17,6 +16,7 @@ env:
   WORKING_DIRECTORY: FhirWatch.Api
 jobs:
   build:
+    name: Build API Function
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -57,9 +57,9 @@ jobs:
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         template: ./templates/main.bicep 
         parameters: 'dataverseClientSecret="${{ secrets.DATAVERSE_CLIENT_SECRET }}"'  
-  build_and_deploy_job:
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Deploy API and Client App
     needs: provision
     steps:
       - uses: actions/checkout@v2
