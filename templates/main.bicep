@@ -54,4 +54,5 @@ output swaProperties object = {
   appName: clientApp.name
   hostname: clientApp.properties.defaultHostname
 }
-output functionProperties object = apiApp.outputs.functionAppProps
+output functionAppName string = apiApp.outputs.functionAppProps.functionAppName
+output functionAppId string = apiApp.outputs.functionAppProps.functionAppId

@@ -37,7 +37,7 @@ jobs:
     needs: build
     outputs:
       swaProperties: ${{ steps.deploy-bicep.outputs.swaProperties }}
-      functionProperties: ${{ steps.deploy-bicep.outputs.functionProperties }}
+      functionAppName: ${{ steps.deploy-bicep.outputs.functionAppName }}
     steps:
     - name: Azure Login
       uses: azure/login@v1
@@ -73,7 +73,7 @@ jobs:
       - name: Deploy to Azure Function App
         uses: Azure/functions-action@v1
         with:
-          app-name: ${{ needs.provision.outputs.functionProperties.functionAppName }}
+          app-name: ${{ needs.provision.outputs.functionAppName }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
       - name: Build And Deploy
         id: builddeploy
