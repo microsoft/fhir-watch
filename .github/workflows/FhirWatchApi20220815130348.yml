@@ -75,7 +75,7 @@ jobs:
           appName=$(echo '${{ needs.provision.outputs.swaProperties }}' | jq -r '.appName')
           echo "APIKEY=$(az staticwebapp secrets list -n $appName | jq -r '.properties.apiKey')" >> $GITHUB_OUTPUT
       - name: Download API artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: .net-app
           path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
